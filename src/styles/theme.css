@@ -1,0 +1,525 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Base surfaces */
+  --bg: #F6F3EA;              /* warm parchment - inner section background */
+  --card-bg: #FFFFFF;
+  --ink: #0E1526;             /* deep navy - hero / footer */
+  --ink-raised: #161F35;      /* slightly lighter navy for cards-on-dark */
+
+  /* Accents */
+  --signal: #3E6FF2;          /* connections / primary actions */
+  --signal-dark: #2E56D1;
+  --signal-light: #E9EFFF;
+  --ember: #E8963D;           /* the highlighted reading path */
+  --ember-light: #FDF0DE;
+  --teal: #2ED9C3;
+  --coral: #FF6B6B;
+
+  /* Back-compat aliases so existing pages/components keep working */
+  --primary: var(--signal);
+  --primary-dark: var(--signal-dark);
+  --primary-light: var(--signal-light);
+  --accent-teal: var(--teal);
+  --accent-coral: var(--coral);
+  --accent-yellow: var(--ember);
+  --accent-blue: var(--signal);
+
+  /* Text */
+  --text-dark: #1B2333;
+  --text-muted: #666F87;
+  --text-on-ink: #EDEFF7;
+  --text-on-ink-muted: #9AA3BD;
+
+  --border: #E4DFD1;
+  --border-on-ink: rgba(237, 239, 247, 0.14);
+
+  --radius: 18px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 28px rgba(14, 21, 38, 0.08);
+  --shadow-lifted: 0 20px 50px rgba(14, 21, 38, 0.16);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Sora', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-dark);
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-dark);
+  font-family: var(--font-body);
+}
+
+a { text-decoration: none; color: inherit; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 15px;
+  font-family: var(--font-body);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+
+.btn-primary {
+  background: var(--signal);
+  color: white;
+  box-shadow: 0 10px 24px rgba(62, 111, 242, 0.32);
+}
+.btn-primary:hover { background: var(--signal-dark); }
+
+.btn-ember {
+  background: var(--ember);
+  color: var(--ink);
+  box-shadow: 0 10px 24px rgba(232, 150, 61, 0.35);
+}
+.btn-ember:hover { background: #D6842C; }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-dark);
+  border: 1.5px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--signal); color: var(--signal); }
+
+.btn-outline-on-ink {
+  background: transparent;
+  color: var(--text-on-ink);
+  border: 1.5px solid var(--border-on-ink);
+}
+.btn-outline-on-ink:hover { border-color: var(--text-on-ink); }
+
+.pill-nav {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 15px;
+  margin: 0 14px;
+}
+.nav-link:hover { color: var(--signal); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+.badge-purple { background: var(--signal-light); color: var(--signal-dark); }
+.badge-teal { background: #E3FBF8; color: #1AA893; }
+.badge-coral { background: #FFECEC; color: #E14B4B; }
+.badge-yellow { background: var(--ember-light); color: #A9631C; }
+.badge-ink { background: rgba(237, 239, 247, 0.1); color: var(--text-on-ink); border: 1px solid var(--border-on-ink); }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+.eyebrow::before {
+  content: '';
+  width: 16px;
+  height: 1.5px;
+  background: var(--ember);
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ember);
+  letter-spacing: 0.04em;
+}
+
+input, textarea {
+  font-family: inherit;
+}
+
+/* ============================================================
+   RESPONSIVE UTILITIES
+   Components use these classes instead of inline grid-template-
+   columns / fixed font sizes wherever the layout needs to adapt
+   below ~900px (tablet) and ~600px (phone).
+   ============================================================ */
+
+/* Fluid headline sizes - replaces hardcoded px in JSX for the
+   handful of large display headings */
+.fluid-h1 {
+  font-size: clamp(30px, 5.5vw, 52px);
+  line-height: 1.1;
+}
+.fluid-h2 {
+  font-size: clamp(22px, 3.4vw, 30px);
+  line-height: 1.25;
+}
+
+/* Two-column hero (text + visual) -> stacks on tablet/phone */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+/* Generic N-column grids used for feature cards, stat cards, etc. */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+/* Dashboard charts row (wide chart + narrow donut) */
+.charts-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+
+/* "How it works" numbered steps - divider lines switch from
+   vertical (side-by-side) to horizontal (stacked) on mobile */
+.steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.step-item { padding-left: 24px; border-left: 1px solid var(--border); }
+.step-item:first-child { padding-left: 0; border-left: none; }
+
+/* Research workspace: graph panel + side drawer -> stacks on mobile */
+.workspace-layout { display: flex; gap: 20px; align-items: flex-start; }
+.workspace-drawer { width: 320px; flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  .container { padding: 0 18px; }
+
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-grid > *:last-child { order: -1; min-height: 260px !important; }
+
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+
+  .steps-grid { grid-template-columns: repeat(2, 1fr); gap: 28px 20px; }
+  .step-item:nth-child(2n+1) { padding-left: 0; border-left: none; }
+  .step-item:nth-child(1), .step-item:nth-child(2) { border-top: none; }
+  .step-item:nth-child(n+3) { border-top: 1px solid var(--border); padding-top: 20px; }
+
+  .workspace-layout { flex-direction: column; }
+  .workspace-drawer { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 0 14px; }
+
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .steps-grid { grid-template-columns: 1fr; gap: 24px; }
+  .step-item { border-left: none; padding-left: 0; }
+  .step-item:nth-child(n+2) { border-top: 1px solid var(--border); padding-top: 20px; }
+
+  .pill-nav { justify-content: center; text-align: center; padding: 14px 20px; }
+  .nav-link { margin: 0 8px; font-size: 14px; }
+
+  .btn { padding: 11px 22px; font-size: 14px; }
+}
+
+/* ============================================================
+   ATMOSPHERE - ambient blurred glow + depth for dark (ink)
+   sections. CSS-only (no image assets, no licensing concerns,
+   loads instantly). Purely decorative: pointer-events none,
+   absolutely positioned, sits behind real content via z-index.
+   ============================================================ */
+
+.ink-surface {
+  position: relative;
+  background: var(--ink);
+  background-image: radial-gradient(rgba(237, 239, 247, 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
+  overflow: hidden;
+}
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.atmosphere::before,
+.atmosphere::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+}
+
+.atmosphere::before {
+  width: 460px;
+  height: 460px;
+  left: -140px;
+  top: -120px;
+  background: radial-gradient(circle, rgba(62, 111, 242, 0.38), transparent 70%);
+}
+
+.atmosphere::after {
+  width: 420px;
+  height: 420px;
+  right: -120px;
+  bottom: -140px;
+  background: radial-gradient(circle, rgba(232, 150, 61, 0.30), transparent 70%);
+}
+
+.atmosphere-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Frosted glass card for surfaces that float on top of .ink-surface
+   (e.g. the login card) - gives real depth instead of a flat white
+   rectangle dropped on navy. */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(237, 239, 247, 0.14);
+  border-radius: var(--radius);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 600px) {
+  .atmosphere::before { width: 300px; height: 300px; filter: blur(50px); }
+  .atmosphere::after { width: 280px; height: 280px; filter: blur(50px); }
+}
+
+.field-on-ink::placeholder {
+  color: rgba(237, 239, 247, 0.4);
+}
+.field-on-ink:focus {
+  border-color: var(--ember) !important;
+}
+
+/* ============================================================
+   EDITORIAL PATTERNS - mixed typography, image-style cards,
+   checklist + collage, icon rows. Adapted from reference layout
+   but built from real product data/icons, not stock photography.
+   ============================================================ */
+
+.accent-line {
+  display: block;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ember);
+}
+
+/* Horizontal "preview" cards - stand-ins for the reference's photo
+   cards, built as flat color fields (each view's actual accent
+   color) with a label overlay, since real screenshots would need
+   a live app to capture. */
+.preview-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: flex-end;
+  padding: 18px;
+  cursor: default;
+}
+.preview-card__label {
+  position: relative;
+  z-index: 1;
+  color: white;
+}
+.preview-card__icon {
+  font-size: 22px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Dark icon row (replaces card grid for the "why it's different"
+   band - full-bleed, horizontal, like the reference's advantages
+   section rather than boxed cards) */
+.icon-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+.icon-row__item {
+  border-top: 1px solid var(--border-on-ink);
+  padding-top: 20px;
+}
+
+/* Checklist */
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+}
+.checklist-item__check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+/* Paper collage - a stack of angled "paper" cards standing in for
+   the reference's photo collage grid */
+.collage {
+  position: relative;
+  height: 380px;
+}
+.collage__card {
+  position: absolute;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lifted);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+
+@media (max-width: 900px) {
+  .icon-row { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .collage { height: 300px; }
+}
+@media (max-width: 600px) {
+  .icon-row { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   PHOTO SECTIONS - hero and mid-page band with a real image
+   background, dark gradient scrim for text legibility (same
+   technique as the reference site), and a numbered step rail.
+   ============================================================ */
+
+.photo-hero {
+  position: relative;
+  min-height: 88vh;
+  display: flex;
+  align-items: flex-end;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+.photo-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 21, 38, 0.55) 0%,
+    rgba(14, 21, 38, 0.35) 40%,
+    rgba(14, 21, 38, 0.92) 100%
+  );
+}
+
+.photo-band {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+.photo-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(14, 21, 38, 0.94) 0%,
+    rgba(14, 21, 38, 0.75) 45%,
+    rgba(14, 21, 38, 0.35) 100%
+  );
+}
+
+.step-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-end;
+}
+.step-rail__item {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: rgba(237, 239, 247, 0.4);
+  transition: color 0.2s ease, font-size 0.2s ease;
+  cursor: default;
+}
+.step-rail__item--active {
+  color: var(--ember);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .photo-hero { min-height: 70vh; }
+  .step-rail { flex-direction: row; align-items: center; }
+}
