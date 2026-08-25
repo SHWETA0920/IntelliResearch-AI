@@ -13,7 +13,7 @@ const FEATURES = [
   },
   {
     key: "path",
-    badge: "badge-teal",
+    badge: "badge-yellow",
     title: "Learning Path",
     short: "AI orders your papers by what depends on what.",
     detail: "Instead of just listing papers, the system finds real prerequisite relationships and arranges a reading order that actually builds understanding.",
@@ -60,8 +60,8 @@ function About() {
     <div>
       <Navbar />
       <div className="container" style={{ marginTop: 60, maxWidth: 900 }}>
-        <span className="badge badge-purple">How it works</span>
-        <h1 style={{ fontSize: 38, fontWeight: 800, marginTop: 14 }}>About IntelliResearch</h1>
+        <span className="eyebrow">How it works</span>
+        <h1 style={{ fontSize: 38, marginTop: 14 }}>About IntelliResearch</h1>
         <p style={{ color: "var(--text-muted)", fontSize: 16, lineHeight: 1.7, marginTop: 12, maxWidth: 640 }}>
           IntelliResearch doesn't just rank papers by difficulty — it discovers
           prerequisite relationships between concepts and papers, then uses
@@ -69,7 +69,7 @@ function About() {
           to see how it works.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, marginTop: 40 }}>
+        <div className="grid-2" style={{ marginTop: 40 }}>
           {FEATURES.map((f) => (
             <FeatureCard
               key={f.key}
@@ -97,7 +97,7 @@ function FeatureCard({ feature, isHovered, onHover, onLeave }) {
         cursor: "pointer",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         transform: isHovered ? "translateY(-4px)" : "none",
-        boxShadow: isHovered ? "0 14px 30px rgba(108,93,211,0.18)" : "var(--shadow)",
+        boxShadow: isHovered ? "0 14px 30px rgba(62,111,242,0.16)" : "var(--shadow)",
       }}
     >
       <span className={`badge ${badge}`}>{title}</span>
@@ -111,19 +111,19 @@ function FeatureCard({ feature, isHovered, onHover, onLeave }) {
   );
 }
 
-/* --- Mini SVG illustrations, purely decorative --- */
+/* --- Mini SVG illustrations, recolored to the ink / signal / ember palette --- */
 
 function SetupVisual({ active }) {
   return (
     <svg width="140" height="70" viewBox="0 0 140 70">
-      <rect x="10" y="15" width="50" height="40" rx="8" fill={active ? "#EFE9FF" : "#F4F2FC"} stroke="#6C5DD3" strokeWidth="1.5" />
-      <text x="35" y="39" textAnchor="middle" fontSize="10" fill="#6C5DD3">Topic</text>
+      <rect x="10" y="15" width="50" height="40" rx="8" fill={active ? "#E9EFFF" : "#F4F2FC"} stroke="#3E6FF2" strokeWidth="1.5" />
+      <text x="35" y="39" textAnchor="middle" fontSize="10" fill="#3E6FF2">Topic</text>
       <rect x="80" y="15" width="50" height="40" rx="8" fill={active ? "#E3FBF8" : "#F4F2FC"} stroke="#2ED9C3" strokeWidth="1.5" />
       <text x="105" y="39" textAnchor="middle" fontSize="10" fill="#1AA893">PDFs</text>
-      <line x1="60" y1="35" x2="80" y2="35" stroke="#B7AEEA" strokeWidth="2" markerEnd="url(#arrow)" />
+      <line x1="60" y1="35" x2="80" y2="35" stroke="#B7C3EA" strokeWidth="2" markerEnd="url(#arrow)" />
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#B7AEEA" />
+          <path d="M0,0 L6,3 L0,6 Z" fill="#B7C3EA" />
         </marker>
       </defs>
     </svg>
@@ -131,17 +131,17 @@ function SetupVisual({ active }) {
 }
 
 function PathVisual({ active }) {
-  const c = active ? ["#6C5DD3", "#2ED9C3", "#FFC542"] : ["#D8D3F5", "#D8D3F5", "#D8D3F5"];
+  const c = active ? ["#3E6FF2", "#E8963D", "#2ED9C3"] : ["#D9DEEF", "#D9DEEF", "#D9DEEF"];
   return (
     <svg width="140" height="60" viewBox="0 0 140 60">
       {[15, 65, 115].map((x, i) => (
         <circle key={x} cx={x} cy="30" r="14" fill={c[i]} />
       ))}
-      <line x1="29" y1="30" x2="51" y2="30" stroke="#B7AEEA" strokeWidth="2" markerEnd="url(#arrow2)" />
-      <line x1="79" y1="30" x2="101" y2="30" stroke="#B7AEEA" strokeWidth="2" markerEnd="url(#arrow2)" />
+      <line x1="29" y1="30" x2="51" y2="30" stroke="#B7C3EA" strokeWidth="2" markerEnd="url(#arrow2)" />
+      <line x1="79" y1="30" x2="101" y2="30" stroke="#B7C3EA" strokeWidth="2" markerEnd="url(#arrow2)" />
       <defs>
         <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#B7AEEA" />
+          <path d="M0,0 L6,3 L0,6 Z" fill="#B7C3EA" />
         </marker>
       </defs>
     </svg>
@@ -151,11 +151,11 @@ function PathVisual({ active }) {
 function KnowledgeVisual({ active }) {
   return (
     <svg width="140" height="80" viewBox="0 0 140 80">
-      <rect x="10" y="10" width="45" height="26" rx="6" fill={active ? "#FFF6E0" : "#F4F2FC"} stroke="#FFC542" strokeWidth="1.5" />
-      <rect x="85" y="10" width="45" height="26" rx="6" fill={active ? "#FFF6E0" : "#F4F2FC"} stroke="#FFC542" strokeWidth="1.5" />
-      <circle cx="70" cy="60" r="16" fill={active ? "#6C5DD3" : "#D8D3F5"} />
-      <line x1="32" y1="36" x2="60" y2="50" stroke="#B7AEEA" strokeWidth="2" />
-      <line x1="107" y1="36" x2="80" y2="50" stroke="#B7AEEA" strokeWidth="2" />
+      <rect x="10" y="10" width="45" height="26" rx="6" fill={active ? "#FDF0DE" : "#F4F2FC"} stroke="#E8963D" strokeWidth="1.5" />
+      <rect x="85" y="10" width="45" height="26" rx="6" fill={active ? "#FDF0DE" : "#F4F2FC"} stroke="#E8963D" strokeWidth="1.5" />
+      <circle cx="70" cy="60" r="16" fill={active ? "#3E6FF2" : "#D9DEEF"} />
+      <line x1="32" y1="36" x2="60" y2="50" stroke="#B7C3EA" strokeWidth="2" />
+      <line x1="107" y1="36" x2="80" y2="50" stroke="#B7C3EA" strokeWidth="2" />
     </svg>
   );
 }
@@ -185,8 +185,8 @@ function ExplorerVisual({ active }) {
           width="30"
           height="40"
           rx="6"
-          fill={i === 1 ? "#EFE9FF" : "#F4F2FC"}
-          stroke="#6C5DD3"
+          fill={i === 1 ? "#E9EFFF" : "#F4F2FC"}
+          stroke="#3E6FF2"
           strokeWidth="1.2"
         />
       ))}
@@ -198,7 +198,7 @@ function AssistantVisual({ active }) {
   return (
     <svg width="140" height="70" viewBox="0 0 140 70">
       <rect x="10" y="10" width="70" height="24" rx="12" fill={active ? "#E3FBF8" : "#F4F2FC"} stroke="#2ED9C3" strokeWidth="1.5" />
-      <rect x="55" y="40" width="75" height="24" rx="12" fill={active ? "#EFE9FF" : "#F4F2FC"} stroke="#6C5DD3" strokeWidth="1.5" />
+      <rect x="55" y="40" width="75" height="24" rx="12" fill={active ? "#FDF0DE" : "#F4F2FC"} stroke="#E8963D" strokeWidth="1.5" />
     </svg>
   );
 }

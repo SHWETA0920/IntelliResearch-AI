@@ -1,4 +1,4 @@
-.counter {
+/* .counter {
   font-size: 16px;
   padding: 5px 10px;
   border-radius: 5px;
@@ -181,4 +181,37 @@
     right: 0;
     border-right-color: var(--border);
   }
+} */
+
+/* src/App.css */
+
+/* #root {
+  width: 100%;
+  min-height: 100vh;
+} */
+
+
+/* .app {
+  width: 100%;
+  min-height: 100vh;
+} */
+
+/* #root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+} */
+
+/* App.css */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
 }

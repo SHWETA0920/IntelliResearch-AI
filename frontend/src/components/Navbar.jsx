@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import "../styles/theme.css";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -6,7 +7,7 @@ function Navbar() {
   return (
     <div className="container" style={{ paddingTop: 24 }}>
       <div className="pill-nav">
-        <Link to="/" style={{ fontWeight: 800, fontSize: 20, color: "var(--primary)" }}>
+        <Link to="/" style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 19, color: "var(--text-dark)" }}>
           IntelliResearch
         </Link>
         <div style={{ display: "flex", alignItems: "center" }}>
