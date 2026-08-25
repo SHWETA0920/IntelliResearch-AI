@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../api/client";
+import "../styles/theme.css";
 
 const SUGGESTED_QUESTIONS = [
   "What should I read first?",
@@ -45,73 +46,96 @@ function AIAssistant() {
   }
 
   return (
-    <div style={{ padding: 40, maxWidth: 700, margin: "0 auto" }}>
-      <Link to={`/research/${id}`} style={{ color: "#888" }}>
-        ← Back to Workspace
-      </Link>
-
-      <h1>AI Research Assistant</h1>
-      {research && <p style={{ color: "#888" }}>{research.topic}</p>}
-      {error && <p style={{ color: "salmon" }}>Error: {error}</p>}
-
-      {messages.length === 0 && (
-        <div style={{ marginTop: 20 }}>
-          <p style={{ color: "#aaa" }}>Try asking:</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {SUGGESTED_QUESTIONS.map((q) => (
-              <button key={q} onClick={() => send(q)} style={{ fontSize: 13 }}>
-                {q}
-              </button>
-            ))}
-          </div>
+    <div style={{ minHeight: "100vh", paddingBottom: 60 }}>
+      <div className="container" style={{ paddingTop: 24 }}>
+        <div className="pill-nav">
+          <Link to={`/research/${id}`} style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 18, color: "var(--signal)" }}>
+            ← Back to Workspace
+          </Link>
         </div>
-      )}
-
-      <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-              background: m.role === "user" ? "#2a3f5f" : "#1e1e1e",
-              border: "1px solid #444",
-              borderRadius: 8,
-              padding: "10px 14px",
-              maxWidth: "80%",
-              color: "#fff",
-            }}
-          >
-            {m.text}
-          </div>
-        ))}
-        {sending && <p style={{ color: "#888" }}>Thinking...</p>}
       </div>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          send();
-        }}
-        style={{ display: "flex", gap: 8, marginTop: 24 }}
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about your papers, prerequisites, or learning path..."
-          style={{
-            flex: 1,
-            padding: 10,
-            background: "#1e1e1e",
-            border: "1px solid #444",
-            color: "#fff",
-            borderRadius: 6,
-          }}
-        />
-        <button type="submit" disabled={sending}>
-          Send
-        </button>
-      </form>
+      <div className="container" style={{ marginTop: 30, maxWidth: 720 }}>
+        <span className="eyebrow">Grounded in your papers only</span>
+        <h1 style={{ fontSize: 32, marginTop: 14 }}>AI Research Assistant</h1>
+        {research && <p style={{ color: "var(--text-muted)", marginTop: 6 }}>{research.topic}</p>}
+        {error && (
+          <p style={{ color: "#E14B4B", background: "#FFECEC", padding: "10px 14px", borderRadius: 10, fontSize: 14, marginTop: 12 }}>
+            Error: {error}
+          </p>
+        )}
+
+        <div className="card" style={{ marginTop: 26, minHeight: 420, display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
+            {messages.length === 0 && (
+              <div>
+                <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 12 }}>Try asking:</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {SUGGESTED_QUESTIONS.map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => send(q)}
+                      className="btn btn-outline"
+                      style={{ fontSize: 13, padding: "8px 16px" }}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                style={{
+                  alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+                  background: m.role === "user" ? "var(--signal)" : "var(--bg)",
+                  color: m.role === "user" ? "white" : "var(--text-dark)",
+                  border: m.role === "user" ? "none" : "1px solid var(--border)",
+                  borderRadius: 14,
+                  padding: "12px 16px",
+                  maxWidth: "80%",
+                  fontSize: 14.5,
+                  lineHeight: 1.55,
+                }}
+              >
+                {m.text}
+              </div>
+            ))}
+            {sending && (
+              <p style={{ color: "var(--text-muted)", fontSize: 13, fontFamily: "var(--font-mono)" }}>Thinking...</p>
+            )}
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              send();
+            }}
+            style={{ display: "flex", gap: 10, marginTop: 20, paddingTop: 18, borderTop: "1px solid var(--border)" }}
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about your papers, prerequisites, or learning path..."
+              style={{
+                flex: 1,
+                padding: "12px 14px",
+                borderRadius: 10,
+                border: "1px solid var(--border)",
+                fontSize: 14,
+                outline: "none",
+                fontFamily: "var(--font-body)",
+              }}
+            />
+            <button className="btn btn-primary" type="submit" disabled={sending}>
+              Send
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

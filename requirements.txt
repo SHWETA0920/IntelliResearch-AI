@@ -1,0 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+Django
+djangorestframework
+django-cors-headers
+python-dotenv
+groq
+pdfplumber
+sentence-transformers
+torch
+numpy
+scikit-learn

@@ -61,6 +61,8 @@ function ResearchSetup() {
         });
       }
 
+      await api.analyzeResearch(research.id);
+
       navigate(`/research/${research.id}`);
     } catch (err) {
       setError(err.message);
@@ -72,8 +74,8 @@ function ResearchSetup() {
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh", paddingBottom: 60 }}>
       <div className="container" style={{ paddingTop: 40, maxWidth: 760 }}>
-        <span className="badge badge-purple">Step 1 of 1</span>
-        <h1 style={{ fontSize: 36, fontWeight: 800, marginTop: 14 }}>What do you want to learn?</h1>
+        <span className="eyebrow">Step 1 of 1</span>
+        <h1 className="fluid-h1" style={{ marginTop: 14 }}>What do you want to learn?</h1>
         <p style={{ color: "var(--text-muted)", marginTop: 4 }}>
           Give a topic and a few papers — we'll take it from there.
         </p>
@@ -137,9 +139,9 @@ function ResearchSetup() {
                     style={{
                       padding: "8px 16px",
                       borderRadius: 999,
-                      border: active ? "1.5px solid var(--primary)" : "1.5px solid var(--border)",
+                      border: active ? "1.5px solid var(--signal)" : "1.5px solid var(--border)",
                       background: active ? "var(--primary-light)" : "white",
-                      color: active ? "var(--primary)" : "var(--text-muted)",
+                      color: active ? "var(--signal)" : "var(--text-muted)",
                       fontSize: 13,
                       fontWeight: 600,
                       cursor: "pointer",
@@ -156,7 +158,7 @@ function ResearchSetup() {
           {/* Goal */}
           <div className="card">
             <label style={labelStyle}>What is your goal?</label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 12 }}>
+            <div className="grid-2" style={{ gap: 10, marginTop: 12 }}>
               {GOALS.map((g) => {
                 const active = goal === g;
                 return (
@@ -168,9 +170,9 @@ function ResearchSetup() {
                       padding: "14px 16px",
                       borderRadius: 12,
                       textAlign: "left",
-                      border: active ? "1.5px solid var(--primary)" : "1.5px solid var(--border)",
+                      border: active ? "1.5px solid var(--signal)" : "1.5px solid var(--border)",
                       background: active ? "var(--primary-light)" : "white",
-                      color: active ? "var(--primary)" : "var(--text-dark)",
+                      color: active ? "var(--signal)" : "var(--text-dark)",
                       fontSize: 14,
                       fontWeight: 600,
                       cursor: "pointer",

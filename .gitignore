@@ -12,3 +12,4 @@ staticfiles/
 .DS_Store
 Thumbs.db
 "@ | Out-File -Encoding utf8 .gitignore
+.env

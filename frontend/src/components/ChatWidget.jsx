@@ -44,10 +44,11 @@ function ChatWidget({ researchId }) {
         >
           <div
             style={{
-              background: "var(--primary)",
+              background: "var(--signal)",
               color: "white",
               padding: "14px 18px",
               fontWeight: 700,
+              fontFamily: "var(--font-display)",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -72,7 +73,7 @@ function ChatWidget({ researchId }) {
                 key={i}
                 style={{
                   alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                  background: m.role === "user" ? "var(--primary-light)" : "#F4F2FC",
+                  background: m.role === "user" ? "var(--primary-light)" : "var(--bg)",
                   color: "var(--text-dark)",
                   borderRadius: 12,
                   padding: "8px 12px",
@@ -83,7 +84,7 @@ function ChatWidget({ researchId }) {
                 {m.text}
               </div>
             ))}
-            {sending && <p style={{ color: "var(--text-muted)", fontSize: 12 }}>Thinking...</p>}
+            {sending && <p style={{ color: "var(--text-muted)", fontSize: 12, fontFamily: "var(--font-mono)" }}>Thinking...</p>}
           </div>
 
           <form
@@ -120,12 +121,12 @@ function ChatWidget({ researchId }) {
           width: 58,
           height: 58,
           borderRadius: "50%",
-          background: "var(--primary)",
-          color: "white",
+          background: "var(--ember)",
+          color: "var(--ink)",
           border: "none",
           fontSize: 24,
           cursor: "pointer",
-          boxShadow: "0 8px 20px rgba(108,93,211,0.4)",
+          boxShadow: "0 8px 20px rgba(232,150,61,0.4)",
         }}
       >
         {open ? "×" : "💬"}

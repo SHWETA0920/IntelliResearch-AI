@@ -72,13 +72,13 @@ function ResearchWorkspace() {
   ];
 
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
+    <div style={{ minHeight: "100vh" }}>
       <div className="container" style={{ paddingTop: 24 }}>
         <div className="pill-nav">
-          <Link to="/dashboard" style={{ fontWeight: 800, fontSize: 18, color: "var(--primary)" }}>
+          <Link to="/dashboard" style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 18, color: "var(--signal)" }}>
             ← Dashboard
           </Link>
-          <Link to={`/research/${id}/papers`} className="nav-link" style={{ fontWeight: 600, color: "var(--primary)" }}>
+          <Link to={`/research/${id}/papers`} className="nav-link" style={{ fontWeight: 600, color: "var(--signal)" }}>
             Open Paper Explorer →
           </Link>
         </div>
@@ -100,7 +100,7 @@ function ResearchWorkspace() {
         </div>
 
         {isAnalyzing && (
-          <div className="card" style={{ marginTop: 20, borderLeft: "4px solid var(--accent-blue)" }}>
+          <div className="card" style={{ marginTop: 20, borderLeft: "4px solid var(--signal)" }}>
             <p style={{ margin: 0, fontWeight: 600 }}>
               {research.status === "pending" ? "⏳ Queued for analysis..." : "🔄 Analyzing your research... this can take a minute."}
             </p>
@@ -108,7 +108,7 @@ function ResearchWorkspace() {
         )}
 
         {research.status === "failed" && (
-          <div className="card" style={{ marginTop: 20, borderLeft: "4px solid var(--accent-coral)" }}>
+          <div className="card" style={{ marginTop: 20, borderLeft: "4px solid var(--coral)" }}>
             <p style={{ margin: 0, color: "#E14B4B", fontWeight: 600 }}>Analysis failed. Please try again.</p>
           </div>
         )}
@@ -128,7 +128,7 @@ function ResearchWorkspace() {
               ))}
             </div>
 
-            <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+            <div className="workspace-layout" style={{ marginTop: 20 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="card" style={{ padding: 0, overflow: "hidden" }}>
                   {activeTab === "path" && (
@@ -200,14 +200,14 @@ function ResearchWorkspace() {
 const nodeStyle = {
   background: "white",
   color: "var(--text-dark)",
-  border: "1.5px solid var(--primary)",
+  border: "1.5px solid var(--signal)",
   borderRadius: 12,
   padding: 12,
   width: 190,
   cursor: "pointer",
   fontWeight: 600,
   fontSize: 13,
-  boxShadow: "0 4px 10px rgba(108,93,211,0.12)",
+  boxShadow: "0 4px 10px rgba(62,111,242,0.14)",
 };
 
 function LearningPathGraph({ papers, prerequisites, onNodeClick }) {
@@ -220,18 +220,20 @@ function LearningPathGraph({ papers, prerequisites, onNodeClick }) {
     style: nodeStyle,
   }));
 
+  // Ember, deliberately matching the hero's "reading path" color - the
+  // Learning Path tab is the same concept the landing page introduces.
   const edges = prerequisites.map((p) => ({
     id: `e${p.id}`,
     source: String(p.prerequisite_paper),
     target: String(p.paper),
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#6C5DD3" },
-    style: { stroke: "#6C5DD3", strokeWidth: 2 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: "#E8963D" },
+    style: { stroke: "#E8963D", strokeWidth: 2.5 },
   }));
 
   return (
     <div style={{ height: 420 }}>
       <ReactFlow nodes={nodes} edges={edges} fitView onNodeClick={(event, node) => onNodeClick(node.id)}>
-        <Background color="#D8D3F5" gap={18} />
+        <Background color="#E4DFD1" gap={18} />
         <Controls />
       </ReactFlow>
     </div>
@@ -252,16 +254,16 @@ function CitationGraph({ papers, citations, onNodeClick }) {
     id: `c${c.id}`,
     source: String(c.citing_paper),
     target: String(c.cited_paper),
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#4A90E2" },
-    style: { stroke: "#4A90E2", strokeWidth: 2 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: "#3E6FF2" },
+    style: { stroke: "#3E6FF2", strokeWidth: 2 },
     label: "cites",
-    labelStyle: { fill: "#4A90E2", fontWeight: 700, fontSize: 12 },
+    labelStyle: { fill: "#3E6FF2", fontWeight: 700, fontSize: 12, fontFamily: "'JetBrains Mono', monospace" },
   }));
 
   return (
     <div style={{ height: 420 }}>
       <ReactFlow nodes={nodes} edges={edges} fitView onNodeClick={(event, node) => onNodeClick(node.id)}>
-        <Background color="#D8D3F5" gap={18} />
+        <Background color="#E4DFD1" gap={18} />
         <Controls />
       </ReactFlow>
     </div>
@@ -285,8 +287,8 @@ function KnowledgeGraph({ papers, concepts, paperConcepts, onPaperClick }) {
     position: { x: i * 240, y: 280 },
     data: { label: concept.name },
     style: {
-      background: "var(--accent-yellow)",
-      color: "#6B4E00",
+      background: "#E8963D",
+      color: "#3A2409",
       border: "none",
       borderRadius: "50%",
       padding: 10,
@@ -298,7 +300,7 @@ function KnowledgeGraph({ papers, concepts, paperConcepts, onPaperClick }) {
       textAlign: "center",
       fontWeight: 700,
       fontSize: 13,
-      boxShadow: "0 4px 14px rgba(255,197,66,0.4)",
+      boxShadow: "0 4px 14px rgba(232,150,61,0.4)",
     },
   }));
 
@@ -311,7 +313,7 @@ function KnowledgeGraph({ papers, concepts, paperConcepts, onPaperClick }) {
       markerEnd: { type: MarkerType.ArrowClosed, color: isIntroduces ? "#2ED9C3" : "#FF6B6B" },
       style: { stroke: isIntroduces ? "#2ED9C3" : "#FF6B6B", strokeWidth: 2 },
       label: isIntroduces ? "introduces" : "requires",
-      labelStyle: { fontWeight: 700, fontSize: 12, fill: isIntroduces ? "#1AA893" : "#E14B4B" },
+      labelStyle: { fontWeight: 700, fontSize: 12, fill: isIntroduces ? "#1AA893" : "#E14B4B", fontFamily: "'JetBrains Mono', monospace" },
     };
   });
 
@@ -325,7 +327,7 @@ function KnowledgeGraph({ papers, concepts, paperConcepts, onPaperClick }) {
           if (node.id.startsWith("paper-")) onPaperClick(node.id.replace("paper-", ""));
         }}
       >
-        <Background color="#D8D3F5" gap={18} />
+        <Background color="#E4DFD1" gap={18} />
         <Controls />
       </ReactFlow>
     </div>
@@ -346,7 +348,7 @@ function PaperDrawer({ paperId, papers, prerequisites, citations, onClose }) {
   };
 
   return (
-    <div className="card" style={{ width: 320, flexShrink: 0, height: "fit-content" }}>
+    <div className="card workspace-drawer" style={{ height: "fit-content" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <h3 style={{ margin: 0, fontSize: 16 }}>{paper.title || paper.file.split("/").pop()}</h3>
         <span onClick={onClose} style={{ cursor: "pointer", fontSize: 20, color: "var(--text-muted)" }}>
@@ -380,13 +382,15 @@ function PaperDrawer({ paperId, papers, prerequisites, citations, onClose }) {
         <p style={{ fontSize: 13, color: "var(--text-muted)" }}>No prerequisites recorded.</p>
       ) : (
         requires.map((r) => (
-          <div key={r.id} className="badge badge-purple" style={{ display: "block", marginBottom: 8, padding: 10 }}>
+          <div key={r.id} style={{ background: "#FDF0DE", borderRadius: 10, padding: 10, marginBottom: 8 }}>
             <p style={{ margin: 0, fontSize: 12 }}>
               Requires: <strong>{findTitle(r.prerequisite_paper)}</strong>
             </p>
             {r.reason && <p style={{ margin: "4px 0 0", fontSize: 11, opacity: 0.85 }}>{r.reason}</p>}
             {r.confidence != null && (
-              <p style={{ margin: "4px 0 0", fontSize: 11, opacity: 0.7 }}>Confidence: {Math.round(r.confidence * 100)}%</p>
+              <p style={{ margin: "4px 0 0", fontSize: 11, opacity: 0.75, fontFamily: "var(--font-mono)" }}>
+                Confidence: {Math.round(r.confidence * 100)}%
+              </p>
             )}
           </div>
         ))
@@ -418,9 +422,10 @@ const sectionLabel = {
   fontSize: 12,
   textTransform: "uppercase",
   letterSpacing: 0.5,
-  color: "var(--primary)",
+  color: "var(--signal)",
   marginTop: 18,
   marginBottom: 6,
+  fontFamily: "var(--font-mono)",
 };
 
 export default ResearchWorkspace;
