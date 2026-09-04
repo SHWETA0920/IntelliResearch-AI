@@ -7,6 +7,7 @@ import ResearchWorkspace from "./pages/ResearchWorkspace";
 import PaperExplorer from "./pages/PaperExplorer";
 import AIAssistant from "./pages/AIAssistant";
 import ChatWidget from "./components/ChatWidget";
+import PaperAnalysisPage from "./pages/PaperAnalysisPage";
 
 function AppLayout() {
   const location = useLocation();
@@ -29,6 +30,7 @@ function AppLayout() {
         <Route path="/research/:id" element={<ResearchWorkspace />} />
         <Route path="/research/:id/papers" element={<PaperExplorer />} />
         <Route path="/research/:id/assistant" element={<AIAssistant />} />
+        <Route path="/research/:id/analysis" element={<PaperAnalysisPage />} />
       </Routes>
 
       {showWidget && <ChatWidget researchId={researchId} />}
