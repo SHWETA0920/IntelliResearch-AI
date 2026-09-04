@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/client";
 import "../styles/ResearchWorkspace.css";
 import researchBackground from "../assets/workspace-background.png";
+import LearningPath from "../components/LearningPath";
 
 const TABS = [
   {
@@ -43,57 +44,59 @@ export default function ResearchWorkspace() {
     loadResearch();
   }, [id]);
 
-  async function loadResearch() {
-    setLoading(true);
-    setError("");
+async function loadResearch() {
+  setLoading(true);
+  setError("");
 
-    try {
-      const [
+  try {
+
+          const [
         researchResponse,
         papersResponse,
         conceptsResponse,
         prerequisitesResponse,
         citationsResponse,
       ] = await Promise.all([
-        api.get(`/research/${id}/`),
-        api.get(`/papers/?research=${id}`),
-        api.get(`/concepts/?research=${id}`),
-        api.get(`/prerequisites/?research=${id}`),
-        api.get(`/citations/?research=${id}`),
+        api.getResearch(id),
+        api.listPapers(id),
+        api.listConcepts(id),
+        api.listPrerequisites(id),
+        api.listCitations(id),
       ]);
 
-      setResearch(researchResponse.data);
+      setResearch(researchResponse);
 
       setPapers(
-        Array.isArray(papersResponse.data)
-          ? papersResponse.data
-          : papersResponse.data?.results || []
+        Array.isArray(papersResponse)
+          ? papersResponse
+          : papersResponse?.results || []
       );
 
       setConcepts(
-        Array.isArray(conceptsResponse.data)
-          ? conceptsResponse.data
-          : conceptsResponse.data?.results || []
+        Array.isArray(conceptsResponse)
+          ? conceptsResponse
+          : conceptsResponse?.results || []
       );
 
       setPrerequisites(
-        Array.isArray(prerequisitesResponse.data)
-          ? prerequisitesResponse.data
-          : prerequisitesResponse.data?.results || []
+        Array.isArray(prerequisitesResponse)
+          ? prerequisitesResponse
+          : prerequisitesResponse?.results || []
       );
 
       setCitations(
-        Array.isArray(citationsResponse.data)
-          ? citationsResponse.data
-          : citationsResponse.data?.results || []
+        Array.isArray(citationsResponse)
+          ? citationsResponse
+          : citationsResponse?.results || []
       );
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load this research workspace.");
-    } finally {
-      setLoading(false);
-    }
+
+  } catch (err) {
+    console.error("Research workspace error:", err);
+    setError("Unable to load this research workspace.");
+  } finally {
+    setLoading(false);
   }
+}
 
   const conceptCount = useMemo(() => {
     if (concepts.length) {
@@ -117,30 +120,43 @@ export default function ResearchWorkspace() {
     return unique.size;
   }, [concepts, papers]);
 
-  function getPaperTitle(paperId) {
-    const paper = papers.find(
-      (item) => String(item.id) === String(paperId)
-    );
+function getPaperTitle(value) {
+  const paperId =
+    value && typeof value === "object"
+      ? value.id
+      : value;
 
-    return (
-      paper?.title ||
-      paper?.name ||
-      `Paper ${paperId}`
-    );
+  const paper = papers.find(
+    (item) => String(item.id) === String(paperId)
+  );
+
+  if (!paper) {
+    return `Paper ${paperId ?? "Unknown"}`;
   }
 
-  function getPaperYear(paper) {
-    return paper?.year || paper?.publication_year || "—";
+  if (paper.title?.trim()) {
+    return paper.title.trim();
   }
 
-  function getPrerequisiteSource(item) {
-    return (
-      item.prerequisite_paper ||
-      item.prerequisite_paper_id ||
-      item.prerequisite ||
-      item.source
-    );
+  if (paper.name?.trim()) {
+    return paper.name.trim();
   }
+
+  if (paper.file) {
+    const filename = paper.file
+      .split("/")
+      .pop()
+      .split("?")[0];
+
+    return decodeURIComponent(filename)
+      .replace(/\.pdf$/i, "")
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  return `Paper ${paper.id}`;
+}
 
   function getPrerequisiteTarget(item) {
     return item.paper || item.paper_id || item.target;
@@ -162,64 +178,7 @@ export default function ResearchWorkspace() {
     );
   }
 
-  function buildLearningPath() {
-    if (!papers.length) return [];
-
-    const prerequisiteMap = new Map();
-
-    prerequisites.forEach((item) => {
-      const target = getPrerequisiteTarget(item);
-      const source = getPrerequisiteSource(item);
-
-      if (target == null || source == null) return;
-
-      const targetId =
-        typeof target === "object" ? target.id : target;
-
-      const sourceId =
-        typeof source === "object" ? source.id : source;
-
-      if (!prerequisiteMap.has(String(targetId))) {
-        prerequisiteMap.set(String(targetId), []);
-      }
-
-      prerequisiteMap
-        .get(String(targetId))
-        .push(String(sourceId));
-    });
-
-    const visited = new Set();
-    const result = [];
-
-    function visit(paper) {
-      const paperId = String(paper.id);
-
-      if (visited.has(paperId)) return;
-
-      const dependencies =
-        prerequisiteMap.get(paperId) || [];
-
-      dependencies.forEach((dependencyId) => {
-        const dependencyPaper = papers.find(
-          (paperItem) =>
-            String(paperItem.id) === dependencyId
-        );
-
-        if (dependencyPaper) {
-          visit(dependencyPaper);
-        }
-      });
-
-      visited.add(paperId);
-      result.push(paper);
-    }
-
-    papers.forEach(visit);
-
-    return result;
-  }
-
-  const learningPath = buildLearningPath();
+  const learningPath = papers;
 
   function handleTabClick(tabId) {
     setActiveTab((current) =>
@@ -388,8 +347,12 @@ export default function ResearchWorkspace() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Citing Paper</th>
-                  <th>Cited Paper</th>
+                  <th>Paper</th>
+                  <th>References</th>
+                  <p>
+  These papers reference each other based on the
+  relationships detected during analysis.
+</p>
                 </tr>
               </thead>
 
@@ -486,201 +449,128 @@ export default function ResearchWorkspace() {
     printAsPdf("Paper Analysis", content);
   }
 
-  function renderLearningPath() {
-    return (
-      <section className="result-card">
-        <div className="result-header">
-          <div>
-            <span className="result-eyebrow">
-              RECOMMENDED READING
-            </span>
+const getPaperById = (paperOrId) => {
+  if (!paperOrId) return null;
 
-            <h2>Learning Path</h2>
+  const id =
+    typeof paperOrId === "object"
+      ? paperOrId.id
+      : paperOrId;
 
-            <p>
-              AI-recommended order to read your
-              papers based on prerequisite
-              relationships.
-            </p>
-          </div>
+  return papers.find(
+    (paper) => String(paper.id) === String(id)
+  );
+};
 
-          <button
-            className="download-button"
-            onClick={downloadLearningPath}
-          >
-            ↓ PDF
-          </button>
+
+const getPaperAuthors = (paperOrId) => {
+  const paper = getPaperById(paperOrId);
+
+  return paper?.authors || "Authors not available";
+};
+
+const getPaperYear = (paperOrId) => {
+  const paper = getPaperById(paperOrId);
+
+  return (
+    paper?.year ||
+    paper?.publication_year ||
+    "—"
+  );
+};
+function renderCitations() {
+  return (
+    <section className="result-card">
+      <div className="result-header">
+        <div>
+          <span className="result-eyebrow">
+            RESEARCH REFERENCES
+          </span>
+
+          <h2>Citations</h2>
+
+          <p>
+            Paper-to-paper citation relationships discovered
+            in your research.
+          </p>
         </div>
 
-        {learningPath.length === 0 ? (
-          <div className="empty-result">
-            No learning path information is
-            available yet.
-          </div>
-        ) : (
-          <div className="learning-path-list">
-            {learningPath.map((paper, index) => (
-              <div
-                className={`learning-paper ${
-                  index === 0 ? "recommended" : ""
-                }`}
-                key={paper.id}
-              >
-                <div className="step-number">
-                  {index + 1}
-                </div>
+        <button
+          className="download-button"
+          onClick={downloadCitations}
+        >
+          ↓ PDF
+        </button>
+      </div>
 
-                <div className="learning-paper-content">
-                  <h3>
-                    {paper.title ||
-                      `Paper ${paper.id}`}
-                  </h3>
-
-                  <p>
-                    {paper.authors ||
-                      "Authors not available"}
-                  </p>
-
-                  <span>
-                    {getPaperYear(paper)}
-                  </span>
-                </div>
-
-                <div className="learning-badge">
-                  {index === 0
-                    ? "Start Here"
-                    : index === 1
-                      ? "Prerequisite"
-                      : "Recommended Next"}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {prerequisites.length > 0 && (
-          <div className="dependency-section">
-            <h3>Paper Dependency Graph</h3>
-
-            <div className="dependency-list">
-              {prerequisites.map((item, index) => {
-                const source =
-                  getPrerequisiteSource(item);
-
-                const target =
-                  getPrerequisiteTarget(item);
-
-                return (
-                  <div
-                    className="dependency-item"
-                    key={item.id || index}
-                  >
-                    <span>
-                      {getPaperTitle(source)}
-                    </span>
-
-                    <b>→</b>
-
-                    <span>
-                      {getPaperTitle(target)}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </section>
-    );
-  }
-
-  function renderCitations() {
-    return (
-      <section className="result-card">
-        <div className="result-header">
-          <div>
-            <span className="result-eyebrow">
-              RESEARCH REFERENCES
-            </span>
-
-            <h2>Citations</h2>
-
-            <p>
-              Paper-to-paper citation relationships
-              discovered in your research.
-            </p>
-          </div>
-
-          <button
-            className="download-button"
-            onClick={downloadCitations}
-          >
-            ↓ PDF
-          </button>
+      {citations.length === 0 ? (
+        <div className="empty-result">
+          No citation relationships were found.
         </div>
+      ) : (
+        <div className="citation-table-wrapper">
+          <table className="citation-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Citing Paper</th>
+                <th>Cited Paper</th>
+                <th>Year</th>
+              </tr>
+            </thead>
 
-        {citations.length === 0 ? (
-          <div className="empty-result">
-            No citation relationships were found.
+            <tbody>
+  {citations.map((citation, index) => {
+    const sourceId =
+      typeof citation.citing_paper === "object"
+        ? citation.citing_paper.id
+        : citation.citing_paper;
+
+    const targetId =
+      typeof citation.cited_paper === "object"
+        ? citation.cited_paper.id
+        : citation.cited_paper;
+
+    const sourcePaper = getPaperById(sourceId);
+    const targetPaper = getPaperById(targetId);
+
+    return (
+      <tr key={citation.id || index}>
+        <td>{index + 1}</td>
+
+        <td>
+          <strong>
+            {getPaperTitle(sourceId)}
+          </strong>
+
+          <div className="citation-meta">
+            {getPaperAuthors(sourceId)}
           </div>
-        ) : (
-          <div className="citation-table-wrapper">
-            <table className="citation-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Citing Paper</th>
-                  <th>Cited Paper</th>
-                  <th>Year</th>
-                </tr>
-              </thead>
+        </td>
 
-              <tbody>
-                {citations.map((citation, index) => {
-                  const source =
-                    getCitationSource(citation);
+        <td>
+          <strong>
+            {getPaperTitle(targetId)}
+          </strong>
 
-                  const target =
-                    getCitationTarget(citation);
-
-                  const sourceId =
-                    typeof source === "object"
-                      ? source.id
-                      : source;
-
-                  const sourcePaper = papers.find(
-                    (paper) =>
-                      String(paper.id) ===
-                      String(sourceId)
-                  );
-
-                  return (
-                    <tr
-                      key={citation.id || index}
-                    >
-                      <td>{index + 1}</td>
-
-                      <td>
-                        {getPaperTitle(source)}
-                      </td>
-
-                      <td>
-                        {getPaperTitle(target)}
-                      </td>
-
-                      <td>
-                        {getPaperYear(sourcePaper)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="citation-meta">
+            {getPaperAuthors(targetId)}
           </div>
-        )}
-      </section>
+        </td>
+
+        <td>
+          {getPaperYear(sourceId)}
+        </td>
+      </tr>
     );
-  }
+  })}
+</tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
 
   function renderAnalysis() {
     return (
@@ -928,8 +818,13 @@ export default function ResearchWorkspace() {
             </div>
           )}
 
-          {activeTab === "learning" &&
-            renderLearningPath()}
+          {activeTab === "learning" && (
+  <LearningPath
+    papers={papers}
+    prerequisites={prerequisites}
+    research={research}
+  />
+)}
 
           {activeTab === "citations" &&
             renderCitations()}
@@ -1017,4 +912,3 @@ export default function ResearchWorkspace() {
     </main>
   );
 }
-

@@ -1,264 +1,9 @@
-# from rest_framework import viewsets
-# from rest_framework.decorators import action
-# from rest_framework.response import Response
-# from .models import Research, Paper, Concept, PaperConcept, Prerequisite, Citation
-# from .serializers import (
-#     ResearchSerializer, PaperSerializer, ConceptSerializer,
-#     PrerequisiteSerializer, CitationSerializer, PaperConceptSerializer,
-# )
-
-
-# class ResearchViewSet(viewsets.ModelViewSet):
-#     queryset = Research.objects.all().order_by("-created_at")
-#     serializer_class = ResearchSerializer
-
-#     @action(detail=True, methods=["post"])
-#     def chat(self, request, pk=None):
-#         """Placeholder chat endpoint. Replace this body with a call to the
-#         teammate's RAG service once its contract is finalized."""
-#         research = self.get_object()
-#         question = request.data.get("message", "")
-
-#         # TODO: replace with real call to teammate's RAG/AI service,
-#         # passing research.id and question, returning their grounded answer.
-#         answer = (
-#             f"(placeholder) You asked about \"{question}\" regarding "
-#             f"\"{research.topic}\". This will be answered by the AI "
-#             f"research assistant once it's connected."
-#         )
-
-#         return Response({"answer": answer, "evidence": []})
-
-
-# class PaperViewSet(viewsets.ModelViewSet):
-#     queryset = Paper.objects.all()
-#     serializer_class = PaperSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         research_id = self.request.query_params.get("research")
-#         if research_id:
-#             qs = qs.filter(research_id=research_id)
-#         return qs
-
-
-# class ConceptViewSet(viewsets.ModelViewSet):
-#     queryset = Concept.objects.all()
-#     serializer_class = ConceptSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         research_id = self.request.query_params.get("research")
-#         if research_id:
-#             qs = qs.filter(research_id=research_id)
-#         return qs
-
-
-# class PrerequisiteViewSet(viewsets.ModelViewSet):
-#     queryset = Prerequisite.objects.all()
-#     serializer_class = PrerequisiteSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         research_id = self.request.query_params.get("research")
-#         if research_id:
-#             qs = qs.filter(paper__research_id=research_id)
-#         return qs
-
-
-# class CitationViewSet(viewsets.ModelViewSet):
-#     queryset = Citation.objects.all()
-#     serializer_class = CitationSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         research_id = self.request.query_params.get("research")
-#         if research_id:
-#             qs = qs.filter(citing_paper__research_id=research_id)
-#         return qs
-
-# class PaperConceptViewSet(viewsets.ModelViewSet):
-#     queryset = PaperConcept.objects.all()
-#     serializer_class = PaperConceptSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         research_id = self.request.query_params.get("research")
-#         if research_id:
-#             qs = qs.filter(paper__research_id=research_id)
-#         return qs
-
-
-# from rest_framework import viewsets
-# from rest_framework.decorators import action
-# from rest_framework.response import Response
-# import traceback
-# from .models import (
-#     Research,
-#     Paper,
-#     Concept,
-#     PaperConcept,
-#     Prerequisite,
-#     Citation,
-# )
-
-# from .serializers import (
-#     ResearchSerializer,
-#     PaperSerializer,
-#     ConceptSerializer,
-#     PrerequisiteSerializer,
-#     CitationSerializer,
-#     PaperConceptSerializer,
-# )
-
-
-# class ResearchViewSet(viewsets.ModelViewSet):
-#     queryset = Research.objects.all().order_by("-created_at")
-#     serializer_class = ResearchSerializer
-
-#     @action(detail=True, methods=["post"])
-#     def analyze(self, request, pk=None):
-#         """
-#         Trigger AI analysis for a research session.
-#         """
-
-#         research = self.get_object()
-
-#         try:
-#             # Import here so the rest of the backend can start normally
-#             # even if the AI pipeline is still being developed.
-#             from .services.pipeline import analyze_research
-
-#             result = analyze_research(research)
-
-#             return Response({
-#                 "success": True,
-#                 "research_id": research.id,
-#                 "result": result,
-#             })
-
-#         # except Exception as exc:
-#         #     return Response(
-#         #         {
-#         #             "success": False,
-#         #             "research_id": research.id,
-#         #             "error": str(exc),
-#         #         },
-#         #         status=500,
-#         #     )
-
-#         except Exception as exc:
-
-#          traceback.print_exc()
-
-#         return Response(
-#         {
-#             "success": False,
-#             "research_id": research.id,
-#             "error": str(exc),
-#         },
-#         status=500,
-#     )
-
-#     @action(detail=True, methods=["post"])
-#     def chat(self, request, pk=None):
-#         """Placeholder chat endpoint. Replace this body with the
-#         teammate's RAG service once its contract is finalized."""
-
-#         research = self.get_object()
-#         question = request.data.get("message", "")
-
-#         answer = (
-#             f'(placeholder) You asked about "{question}" regarding '
-#             f'"{research.topic}". This will be answered by the AI '
-#             f"research assistant once it's connected."
-#         )
-
-#         return Response({
-#             "answer": answer,
-#             "evidence": [],
-#         })
-
-
-# class PaperViewSet(viewsets.ModelViewSet):
-#     queryset = Paper.objects.all()
-#     serializer_class = PaperSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-
-#         research_id = self.request.query_params.get("research")
-
-#         if research_id:
-#             qs = qs.filter(research_id=research_id)
-
-#         return qs
-
-
-# class ConceptViewSet(viewsets.ModelViewSet):
-#     queryset = Concept.objects.all()
-#     serializer_class = ConceptSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-
-#         research_id = self.request.query_params.get("research")
-
-#         if research_id:
-#             qs = qs.filter(research_id=research_id)
-
-#         return qs
-
-
-# class PrerequisiteViewSet(viewsets.ModelViewSet):
-#     queryset = Prerequisite.objects.all()
-#     serializer_class = PrerequisiteSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-
-#         research_id = self.request.query_params.get("research")
-
-#         if research_id:
-#             qs = qs.filter(paper__research_id=research_id)
-
-#         return qs
-
-
-# class CitationViewSet(viewsets.ModelViewSet):
-#     queryset = Citation.objects.all()
-#     serializer_class = CitationSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-
-#         research_id = self.request.query_params.get("research")
-
-#         if research_id:
-#             qs = qs.filter(citing_paper__research_id=research_id)
-
-#         return qs
-
-
-# class PaperConceptViewSet(viewsets.ModelViewSet):
-#     queryset = PaperConcept.objects.all()
-#     serializer_class = PaperConceptSerializer
-
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-
-#         research_id = self.request.query_params.get("research")
-
-#         if research_id:
-#             qs = qs.filter(paper__research_id=research_id)
-
-#         return qs
-
 import traceback
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import viewsets, serializers
 
 from .models import (
     Research,
@@ -276,6 +21,7 @@ from .serializers import (
     PrerequisiteSerializer,
     CitationSerializer,
     PaperConceptSerializer,
+    AnalyzeSerializer,
 )
 
 
@@ -283,7 +29,13 @@ class ResearchViewSet(viewsets.ModelViewSet):
     queryset = Research.objects.all().order_by("-created_at")
     serializer_class = ResearchSerializer
 
-    @action(detail=True, methods=["post"])
+    # @action(detail=True, methods=["post"])
+    # def analyze(self, request, pk=None):
+    @action(
+    detail=True,
+    methods=["post"],
+    serializer_class=AnalyzeSerializer,
+)
     def analyze(self, request, pk=None):
         """
         Analyze all papers belonging to a research session.
@@ -419,6 +171,20 @@ class PrerequisiteViewSet(viewsets.ModelViewSet):
         return qs
 
 
+# class CitationViewSet(viewsets.ModelViewSet):
+#     queryset = Citation.objects.all()
+#     serializer_class = CitationSerializer
+
+#     def get_queryset(self):
+#         qs = super().get_queryset()
+
+#         research_id = self.request.query_params.get("research")
+
+#         if research_id:
+#             qs = qs.filter(citing_paper__research_id=research_id)
+
+#         return qs
+
 class CitationViewSet(viewsets.ModelViewSet):
     queryset = Citation.objects.all()
     serializer_class = CitationSerializer
@@ -429,9 +195,22 @@ class CitationViewSet(viewsets.ModelViewSet):
         research_id = self.request.query_params.get("research")
 
         if research_id:
-            qs = qs.filter(citing_paper__research_id=research_id)
+            qs = qs.filter(
+                citing_paper__research_id=research_id
+            )
 
         return qs
+
+    def perform_create(self, serializer):
+        citing_paper = serializer.validated_data["citing_paper"]
+        cited_paper = serializer.validated_data["cited_paper"]
+
+        if citing_paper.research_id != cited_paper.research_id:
+            raise serializers.ValidationError(
+                "Both papers must belong to the same research session."
+            )
+
+        serializer.save()
 
 
 class PaperConceptViewSet(viewsets.ModelViewSet):

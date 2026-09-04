@@ -19,19 +19,40 @@ class Research(models.Model):
         return self.topic
 
 
-class Paper(models.Model):
-    """One uploaded PDF, belonging to a Research session."""
+# class Paper(models.Model):
+#     """One uploaded PDF, belonging to a Research session."""
 
-    research = models.ForeignKey(Research, related_name="papers", on_delete=models.CASCADE)
+#     research = models.ForeignKey(Research, related_name="papers", on_delete=models.CASCADE)
+#     file = models.FileField(upload_to="papers/")
+#     title = models.CharField(max_length=500, blank=True)
+#     authors = models.CharField(max_length=500, blank=True)
+#     year = models.IntegerField(null=True, blank=True)
+#     abstract = models.TextField(blank=True)
+#     order_position = models.IntegerField(null=True, blank=True)
+#     ai_summary = models.TextField(blank=True)
+#     raw_ai_data = models.JSONField(default=dict, blank=True)
+
+class Paper(models.Model):
+    research = models.ForeignKey(
+        Research,
+        related_name="papers",
+        on_delete=models.CASCADE
+    )
+
     file = models.FileField(upload_to="papers/")
+
     title = models.CharField(max_length=500, blank=True)
     authors = models.CharField(max_length=500, blank=True)
     year = models.IntegerField(null=True, blank=True)
     abstract = models.TextField(blank=True)
+
+    text = models.TextField(blank=True)
+
     order_position = models.IntegerField(null=True, blank=True)
+
     ai_summary = models.TextField(blank=True)
     raw_ai_data = models.JSONField(default=dict, blank=True)
-
+    
     def __str__(self):
         return self.title or self.file.name
 

@@ -41,3 +41,8 @@ class PaperConceptSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaperConcept
         fields = ["id", "paper", "concept", "role"]
+class AnalyzeSerializer(serializers.Serializer):
+    """
+    Analyze endpoint does not require any request data.
+    """
+    pass
