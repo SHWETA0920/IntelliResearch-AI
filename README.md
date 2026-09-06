@@ -200,9 +200,3 @@ This project is provided as-is for educational/personal use. Add a license of yo
 
 ---
 
-## 🙌 Contributors
-
-- Core application, backend pipeline, and dashboard UI
-- Learning Path & Citations feature contributions
-
-*(Replace with actual names/links.)*
