@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/client";
 import "../styles/ResearchWorkspace.css";
 import researchBackground from "../assets/workspace-background.png";
+import LearningPath from "../components/LearningPath";
 
 const TABS = [
   {
@@ -36,10 +37,6 @@ const DEEP_ANALYSIS_FIELDS = [
   { key: "future_work", label: "Future Work" },
 ];
 
-// Ported from PaperAnalysisPage.jsx — that page used a separate route
-// (/research/:id/analysis) which is no longer navigated to now that the
-// "Paper Analysis" tab renders inline here instead. Keeping both files'
-// deep-analysis rendering in sync until one of them is retired.
 function DeepAnalysisSection({ deep }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -48,71 +45,31 @@ function DeepAnalysisSection({ deep }) {
   if (!deep || (!hasStructuredFields && !deep.raw_response)) return null;
 
   return (
-    <div style={{ marginTop: 18 }}>
+    <div className="deep-analysis">
       <button
+        type="button"
+        className="deep-analysis-toggle"
         onClick={() => setExpanded((e) => !e)}
-        style={{
-          background: "none",
-          border: "1px solid var(--border)",
-          borderRadius: 8,
-          padding: "6px 14px",
-          fontSize: 13,
-          fontWeight: 600,
-          color: "var(--signal, var(--primary))",
-          cursor: "pointer",
-        }}
       >
         {expanded ? "▲ Hide deep analysis" : "▼ Show deep analysis"}
       </button>
 
       {expanded && (
-        <div
-          style={{
-            marginTop: 14,
-            display: "grid",
-            gap: 14,
-            background: "rgba(255,255,255,0.03)",
-            borderRadius: 10,
-            padding: 16,
-          }}
-        >
-          {deep.error && (
-            <p style={{ fontSize: 13, color: "#FF6B6B" }}>⚠ {deep.error}</p>
-          )}
+        <div className="deep-analysis-panel">
+          {deep.error && <p className="deep-analysis-error">⚠ {deep.error}</p>}
 
-          {hasStructuredFields ? (
-            DEEP_ANALYSIS_FIELDS.map((f) =>
-              deep[f.key] ? (
-                <div key={f.key}>
-                  <p
-                    style={{
-                      fontWeight: 700,
-                      fontSize: 11,
-                      textTransform: "uppercase",
-                      letterSpacing: 0.6,
-                      color: "var(--text-h, #fff)",
-                      marginBottom: 4,
-                    }}
-                  >
-                    {f.label}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      lineHeight: 1.5,
-                      color: "var(--text-muted, #9ca3af)",
-                    }}
-                  >
-                    {deep[f.key]}
-                  </p>
-                </div>
-              ) : null,
-            )
-          ) : deep.raw_response ? (
-            <p style={{ fontSize: 13, color: "var(--text-muted, #9ca3af)" }}>
-              {deep.raw_response}
-            </p>
-          ) : null}
+          {hasStructuredFields
+            ? DEEP_ANALYSIS_FIELDS.map((f) =>
+                deep[f.key] ? (
+                  <div className="deep-analysis-field" key={f.key}>
+                    <p className="deep-analysis-label">{f.label}</p>
+                    <p className="deep-analysis-value">{deep[f.key]}</p>
+                  </div>
+                ) : null,
+              )
+            : deep.raw_response && (
+                <p className="deep-analysis-value">{deep.raw_response}</p>
+              )}
         </div>
       )}
     </div>
@@ -224,13 +181,59 @@ export default function ResearchWorkspace() {
     return Math.round((analyzed / papers.length) * 100);
   }, [papers]);
 
-  function getPaperTitle(paperId) {
-    const paper = papers.find((item) => String(item.id) === String(paperId));
+  // --- Paper lookup helpers ---------------------------------------------
+  // Merged with the more robust versions from the Learning Path/Citations
+  // branch: getPaperById accepts either a raw id or a paper-shaped object
+  // (both show up across the API responses), and getPaperTitle falls back
+  // to deriving a readable title from the filename when no title/name is
+  // set. Existing call sites that pass a full paper object still work
+  // unchanged since getPaperById extracts .id when given an object.
 
-    return paper?.title || paper?.name || `Paper ${paperId}`;
+  function getPaperById(paperOrId) {
+    if (!paperOrId) return null;
+
+    const paperId =
+      typeof paperOrId === "object" ? paperOrId.id : paperOrId;
+
+    return papers.find((paper) => String(paper.id) === String(paperId));
   }
 
-  function getPaperYear(paper) {
+  function getPaperTitle(value) {
+    const paperId = value && typeof value === "object" ? value.id : value;
+    const paper = papers.find((item) => String(item.id) === String(paperId));
+
+    if (!paper) {
+      return `Paper ${paperId ?? "Unknown"}`;
+    }
+
+    if (paper.title?.trim()) {
+      return paper.title.trim();
+    }
+
+    if (paper.name?.trim()) {
+      return paper.name.trim();
+    }
+
+    if (paper.file) {
+      const filename = paper.file.split("/").pop().split("?")[0];
+
+      return decodeURIComponent(filename)
+        .replace(/\.pdf$/i, "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    return `Paper ${paper.id}`;
+  }
+
+  function getPaperAuthors(paperOrId) {
+    const paper = getPaperById(paperOrId);
+    return paper?.authors || "Authors not available";
+  }
+
+  function getPaperYear(paperOrId) {
+    const paper = getPaperById(paperOrId);
     return paper?.year || paper?.publication_year || "—";
   }
 
@@ -255,6 +258,9 @@ export default function ResearchWorkspace() {
     return item.cited_paper || item.cited_paper_id || item.target;
   }
 
+  // Kept for the PDF export only — the on-screen Learning Path tab now
+  // renders via the <LearningPath /> component instead (see results-area
+  // below), but downloadLearningPath() still needs an ordered list here.
   function buildLearningPath() {
     if (!papers.length) return [];
 
@@ -267,7 +273,6 @@ export default function ResearchWorkspace() {
       if (target == null || source == null) return;
 
       const targetId = typeof target === "object" ? target.id : target;
-
       const sourceId = typeof source === "object" ? source.id : source;
 
       if (!prerequisiteMap.has(String(targetId))) {
@@ -487,7 +492,6 @@ export default function ResearchWorkspace() {
                 ${citations
                   .map((citation, index) => {
                     const source = getCitationSource(citation);
-
                     const target = getCitationTarget(citation);
 
                     return `
@@ -588,85 +592,10 @@ export default function ResearchWorkspace() {
     printAsPdf("Paper Analysis", content);
   }
 
-  function renderLearningPath() {
-    return (
-      <section className="result-card">
-        <div className="result-header">
-          <div>
-            <span className="result-eyebrow">RECOMMENDED READING</span>
-
-            <h2>Learning Path</h2>
-
-            <p>
-              AI-recommended order to read your papers based on prerequisite
-              relationships.
-            </p>
-          </div>
-
-          <button className="download-button" onClick={downloadLearningPath}>
-            ↓ PDF
-          </button>
-        </div>
-
-        {learningPath.length === 0 ? (
-          <div className="empty-result">
-            No learning path information is available yet.
-          </div>
-        ) : (
-          <div className="learning-path-list">
-            {learningPath.map((paper, index) => (
-              <div
-                className={`learning-paper ${index === 0 ? "recommended" : ""}`}
-                key={paper.id}
-              >
-                <div className="step-number">{index + 1}</div>
-
-                <div className="learning-paper-content">
-                  <h3>{paper.title || `Paper ${paper.id}`}</h3>
-
-                  {paper.authors && <p>{paper.authors}</p>}
-
-                  <span>{getPaperYear(paper)}</span>
-                </div>
-
-                <div className="learning-badge">
-                  {index === 0
-                    ? "Start Here"
-                    : index === 1
-                      ? "Prerequisite"
-                      : "Recommended Next"}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {prerequisites.length > 0 && (
-          <div className="dependency-section">
-            <h3>Paper Dependency Graph</h3>
-
-            <div className="dependency-list">
-              {prerequisites.map((item, index) => {
-                const source = getPrerequisiteSource(item);
-
-                const target = getPrerequisiteTarget(item);
-
-                return (
-                  <div className="dependency-item" key={item.id || index}>
-                    <span>{getPaperTitle(source)}</span>
-
-                    <b>→</b>
-
-                    <span>{getPaperTitle(target)}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </section>
-    );
-  }
+  // renderLearningPath() was removed — the Learning Path tab now renders
+  // via the <LearningPath /> component (see results-area below).
+  // downloadLearningPath() above still builds its own list independently,
+  // so the PDF export is unaffected by that swap.
 
   function renderCitations() {
     return (
@@ -678,7 +607,8 @@ export default function ResearchWorkspace() {
             <h2>Citations</h2>
 
             <p>
-              Paper-to-paper citation relationships discovered in your research.
+              Paper-to-paper citation relationships discovered in your
+              research.
             </p>
           </div>
 
@@ -706,25 +636,27 @@ export default function ResearchWorkspace() {
               <tbody>
                 {citations.map((citation, index) => {
                   const source = getCitationSource(citation);
-
                   const target = getCitationTarget(citation);
-
-                  const sourceId =
-                    typeof source === "object" ? source.id : source;
-
-                  const sourcePaper = papers.find(
-                    (paper) => String(paper.id) === String(sourceId),
-                  );
 
                   return (
                     <tr key={citation.id || index}>
                       <td>{index + 1}</td>
 
-                      <td>{getPaperTitle(source)}</td>
+                      <td>
+                        <strong>{getPaperTitle(source)}</strong>
+                        <div className="citation-meta">
+                          {getPaperAuthors(source)}
+                        </div>
+                      </td>
 
-                      <td>{getPaperTitle(target)}</td>
+                      <td>
+                        <strong>{getPaperTitle(target)}</strong>
+                        <div className="citation-meta">
+                          {getPaperAuthors(target)}
+                        </div>
+                      </td>
 
-                      <td>{getPaperYear(sourcePaper)}</td>
+                      <td>{getPaperYear(source)}</td>
                     </tr>
                   );
                 })}
@@ -746,8 +678,8 @@ export default function ResearchWorkspace() {
             <h2>Paper Analysis</h2>
 
             <p>
-              Detailed information and AI-generated summaries for your research
-              papers.
+              Detailed information and AI-generated summaries for your
+              research papers.
             </p>
           </div>
 
@@ -818,9 +750,7 @@ export default function ResearchWorkspace() {
                     })()}
                   </div>
 
-                  <DeepAnalysisSection
-                    deep={paper.raw_ai_data?.deep_analysis}
-                  />
+                  <DeepAnalysisSection deep={paper.raw_ai_data?.deep_analysis} />
                 </div>
               </article>
             ))}
@@ -993,7 +923,14 @@ export default function ResearchWorkspace() {
               </div>
             )}
 
-            {activeTab === "learning" && renderLearningPath()}
+            {activeTab === "learning" && (
+              <LearningPath
+                papers={papers}
+                prerequisites={prerequisites}
+                research={research}
+              />
+            )}
+
             {activeTab === "citations" && renderCitations()}
             {activeTab === "analysis" && renderAnalysis()}
           </section>
@@ -1049,8 +986,8 @@ export default function ResearchWorkspace() {
             </div>
 
             <div className="footer-quote">
-              Research is to see what everybody else has seen, and to think what
-              nobody else has thought.
+              Research is to see what everybody else has seen, and to think
+              what nobody else has thought.
             </div>
           </footer>
         </div>

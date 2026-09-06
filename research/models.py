@@ -28,6 +28,12 @@ class Paper(models.Model):
     authors = models.CharField(max_length=500, blank=True)
     year = models.IntegerField(null=True, blank=True)
     abstract = models.TextField(blank=True)
+    # NEW: caches the full extracted PDF text, so it only needs to be
+    # parsed once per paper (during analyze) instead of every time some
+    # feature needs the raw text — key_points, deep_analysis, citation
+    # detection, and chat indexing can all now read this instead of
+    # each re-running pdfplumber themselves.
+    text = models.TextField(blank=True)
     order_position = models.IntegerField(null=True, blank=True)
     ai_summary = models.TextField(blank=True)
     raw_ai_data = models.JSONField(default=dict, blank=True)
