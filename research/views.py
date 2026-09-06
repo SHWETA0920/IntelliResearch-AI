@@ -1,6 +1,6 @@
 import traceback
 
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -20,6 +20,7 @@ from .serializers import (
     PrerequisiteSerializer,
     CitationSerializer,
     PaperConceptSerializer,
+    AnalyzeSerializer,
 )
 
 
@@ -27,20 +28,29 @@ class ResearchViewSet(viewsets.ModelViewSet):
     queryset = Research.objects.all().order_by("-created_at")
     serializer_class = ResearchSerializer
 
-    @action(detail=True, methods=["post"])
+    @action(
+        detail=True,
+        methods=["post"],
+        serializer_class=AnalyzeSerializer,
+    )
     def analyze(self, request, pk=None):
         """
         Analyze all papers belonging to a research session.
+
+        Runs BOTH: citation/prerequisite detection (rule-based) and
+        LLM-based key-point/deep-analysis/chat-indexing — combined into
+        one call to research.services.pipeline.analyze_research().
+        research.status transitions are owned entirely here, not inside
+        the pipeline, so there's a single source of truth for status.
         """
 
-        try:
-            # Get research object
-            research = self.get_object()
+        research = self.get_object()
 
-            # Get all papers belonging to this research
+        try:
+            from .services.pipeline import analyze_research
+
             papers = research.papers.all()
 
-            # Check whether papers exist
             if not papers.exists():
                 return Response(
                     {
@@ -52,17 +62,11 @@ class ResearchViewSet(viewsets.ModelViewSet):
                     status=400,
                 )
 
-            # Mark research as analyzing
             research.status = "analyzing"
             research.save(update_fields=["status"])
 
-            # Import pipeline here
-            from .services.pipeline import analyze_research
-
-            # Run analysis
             result = analyze_research(research)
 
-            # Mark research as ready
             research.status = "ready"
             research.save(update_fields=["status"])
 
@@ -77,23 +81,17 @@ class ResearchViewSet(viewsets.ModelViewSet):
             )
 
         except Exception as exc:
-            # Print complete error in Django terminal
             traceback.print_exc()
 
-            # Try to mark research as failed
-            try:
-                research.status = "failed"
-                research.save(update_fields=["status"])
-            except Exception:
-                pass
+            research.status = "failed"
+            research.save(update_fields=["status"])
 
             return Response(
                 {
                     "success": False,
-                    "research_id": getattr(research, "id", pk),
-                    "status": "failed",
+                    "research_id": research.id,
+                    "status": research.status,
                     "error": str(exc),
-                    "error_type": type(exc).__name__,
                 },
                 status=500,
             )
@@ -200,6 +198,17 @@ class CitationViewSet(viewsets.ModelViewSet):
             qs = qs.filter(citing_paper__research_id=research_id)
 
         return qs
+
+    def perform_create(self, serializer):
+        citing_paper = serializer.validated_data["citing_paper"]
+        cited_paper = serializer.validated_data["cited_paper"]
+
+        if citing_paper.research_id != cited_paper.research_id:
+            raise serializers.ValidationError(
+                "Both papers must belong to the same research session."
+            )
+
+        serializer.save()
 
 
 class PaperConceptViewSet(viewsets.ModelViewSet):
