@@ -8,10 +8,20 @@ import "../styles/theme.css";
 
 import heroImg from "../assets/images/hero-books.jpg";
 import bandImg from "../assets/images/study-band.jpg";
-import cardBooks from "../assets/images/cards/card-books.jpg";
+import bandImgs from "../assets/images/study-band1.jpg";
+import cardNote from "../assets/images/cards/card-note.jpg";
 import cardNotes from "../assets/images/cards/card-notes.jpg";
 import cardLibrary from "../assets/images/cards/card-library.jpg";
 import contactBg from "../assets/images/contact-bg.jpg";
+
+import card1 from "../assets/images/card/card1.jpg";
+import card2 from "../assets/images/card/card2.jpg";
+import card3 from "../assets/images/card/card3.jpg";
+import card4 from "../assets/images/card/card4.jpg";
+import card5 from "../assets/images/card/card5.jpg";
+import card6 from "../assets/images/card/card6.jpg";
+import card7 from "../assets/images/card/card7.jpg";
+import card8 from "../assets/images/card/card8.jpg";
 
 /* ============================================================
    CONSTELLATION ART
@@ -63,11 +73,7 @@ function ConstellationHero() {
             y1={from.y}
             x2={to.x}
             y2={to.y}
-            stroke={
-              onPath
-                ? "#E8963D"
-                : "rgba(27,35,51,0.14)"
-            }
+            stroke={onPath ? "#E8963D" : "rgba(27,35,51,0.14)"}
             strokeWidth={onPath ? 2.5 : 1.2}
           />
         );
@@ -79,11 +85,7 @@ function ConstellationHero() {
             cx={n.x}
             cy={n.y}
             r={n.onPath ? 26 : 20}
-            fill={
-              n.onPath
-                ? "rgba(232,150,61,0.14)"
-                : "rgba(62,111,242,0.10)"
-            }
+            fill={n.onPath ? "rgba(232,150,61,0.14)" : "rgba(62,111,242,0.10)"}
           />
 
           <rect
@@ -93,9 +95,7 @@ function ConstellationHero() {
             height="30"
             rx="4"
             fill="#FFFFFF"
-            stroke={
-              n.onPath ? "#E8963D" : "#3E6FF2"
-            }
+            stroke={n.onPath ? "#E8963D" : "#3E6FF2"}
             strokeWidth="1.5"
           />
 
@@ -159,6 +159,8 @@ function ConstellationHero() {
    DATA
 ============================================================ */
 
+// FIX: keys now match the hyphenated CSS class names exactly
+// (about-gallery__small-1 / small-2), not small1/small2.
 const GALLERY_TILES = [
   {
     key: "large",
@@ -167,14 +169,14 @@ const GALLERY_TILES = [
     caption: "Confidence-scored edges",
   },
   {
-    key: "small1",
-    image: cardNotes,
+    key: "small-1",
+    image: cardNote,
     title: "Citation Graph",
     caption: "Who cites whom",
   },
   {
-    key: "small2",
-    image: cardBooks,
+    key: "small-2",
+    image: cardNotes,
     title: "Paper Explorer",
     caption: "Every abstract, searchable",
   },
@@ -212,44 +214,59 @@ const CHECKLIST = [
   "Ask the assistant anything — grounded in your papers only",
 ];
 
-const CAROUSEL_ITEMS = [
-  {
-    label: "Paper Explorer",
-    color: "#7C9EF2",
-    image: cardBooks,
-  },
-  {
-    label: "Citation Graph",
-    color: "#5B8DEF",
-    image: cardNotes,
-  },
-  {
-    label: "Prerequisites",
-    color: "#2ED9C3",
-    image: cardLibrary,
-  },
-  {
-    label: "Learning Path",
-    color: "#E8963D",
-    image: cardBooks,
-  },
-  {
-    label: "Knowledge Graph",
-    color: "#3E6FF2",
-    image: cardNotes,
-  },
-  {
-    label: "Confidence Scores",
-    color: "#16213E",
-    image: cardLibrary,
-  },
-  {
-    label: "AI Assistant",
-    color: "#A9C2FA",
-    image: cardBooks,
-  },
-];
+// const CAROUSEL_ITEMS = [
+//   {
+//     label: "Paper Explorer",
+//     color: "#7C9EF2",
+//     image: cardBooks,
+//   },
+//   {
+//     label: "Citation Graph",
+//     color: "#5B8DEF",
+//     image: cardNotes,
+//   },
+//   {
+//     label: "Prerequisites",
+//     color: "#2ED9C3",
+//     image: cardLibrary,
+//   },
+//   {
+//     label: "Learning Path",
+//     color: "#E8963D",
+//     image: cardBooks,
+//   },
+//   {
+//     label: "Knowledge Graph",
+//     color: "#3E6FF2",
+//     image: cardNotes,
+//   },
+//   {
+//     label: "Confidence Scores",
+//     color: "#16213E",
+//     image: cardLibrary,
+//   },
+//   {
+//     label: "AI Assistant",
+//     color: "#A9C2FA",
+//     image: cardBooks,
+//   },
+//   {
+//     label: "AI Assistant",
+//     color: "#A9C2FA",
+//     image: cardBooks,
+//   },
+// ];
 
+const CAROUSEL_ITEMS = [
+  { label: "Paper Explorer", color: "#7C9EF2", image: card1 },
+  { label: "Citation Graph", color: "#5B8DEF", image: card2 },
+  { label: "Prerequisites", color: "#2ED9C3", image: card3 },
+  { label: "Learning Path", color: "#E8963D", image: card4 },
+  { label: "Knowledge Graph", color: "#3E6FF2", image: card5 },
+  { label: "Confidence Scores", color: "#16213E", image: card6 },
+  { label: "AI Assistant", color: "#A9C2FA", image: card7 },
+  { label: "Something New", color: "#FF6B6B", image: card8 },
+];
 const CONTACT_REASONS = [
   {
     icon: "💬",
@@ -327,9 +344,7 @@ function SectionBlock({
 
           padding: "16px 24px 16px 30px",
 
-          background: dark
-            ? "rgba(22,33,62,0.96)"
-            : "rgba(255,255,255,0.97)",
+          background: dark ? "rgba(22,33,62,0.96)" : "rgba(255,255,255,0.97)",
 
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
@@ -357,8 +372,7 @@ function SectionBlock({
             top: 0,
             bottom: 0,
             width: 6,
-            background:
-              "linear-gradient(180deg, #F2B36A, #E8963D)",
+            background: "linear-gradient(180deg, #F2B36A, #E8963D)",
           }}
         />
 
@@ -370,8 +384,7 @@ function SectionBlock({
             right: 75,
             top: 0,
             height: 2,
-            background:
-              "linear-gradient(90deg, #E8963D, transparent)",
+            background: "linear-gradient(90deg, #E8963D, transparent)",
             opacity: 0.8,
           }}
         />
@@ -430,8 +443,7 @@ function SectionBlock({
               fontSize: 12,
               fontWeight: 700,
 
-              border:
-                "1px solid rgba(232,150,61,0.25)",
+              border: "1px solid rgba(232,150,61,0.25)",
             }}
           >
             {number}
@@ -446,9 +458,7 @@ function SectionBlock({
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
 
-                color: dark
-                  ? "rgba(255,255,255,0.46)"
-                  : "rgba(22,33,62,0.48)",
+                color: dark ? "rgba(255,255,255,0.46)" : "rgba(22,33,62,0.48)",
 
                 marginBottom: 4,
               }}
@@ -461,9 +471,7 @@ function SectionBlock({
                 fontSize: 16,
                 fontWeight: 700,
 
-                color: dark
-                  ? "#FFFFFF"
-                  : "#16213E",
+                color: dark ? "#FFFFFF" : "#16213E",
 
                 whiteSpace: "nowrap",
                 overflow: "hidden",
@@ -488,9 +496,7 @@ function SectionBlock({
             fontSize: 10,
             letterSpacing: "0.08em",
 
-            color: dark
-              ? "rgba(255,255,255,0.62)"
-              : "rgba(22,33,62,0.56)",
+            color: dark ? "rgba(255,255,255,0.62)" : "rgba(22,33,62,0.56)",
 
             position: "relative",
             zIndex: 1,
@@ -510,9 +516,7 @@ function SectionBlock({
 
               border:
                 "1px solid " +
-                (dark
-                  ? "rgba(255,255,255,0.18)"
-                  : "rgba(22,33,62,0.13)"),
+                (dark ? "rgba(255,255,255,0.18)" : "rgba(22,33,62,0.13)"),
 
               fontSize: 15,
             }}
@@ -541,9 +545,7 @@ function SectionBlock({
             bottom: 0,
             width: 36,
             height: 3,
-            background: dark
-              ? "rgba(255,255,255,0.24)"
-              : "rgba(22,33,62,0.14)",
+            background: dark ? "rgba(255,255,255,0.24)" : "rgba(22,33,62,0.14)",
           }}
         />
       </motion.div>
@@ -563,23 +565,14 @@ function ContactSection() {
     <div
       className="field-icon-wrap"
       style={{
-        transition:
-          "transform 0.2s ease, box-shadow 0.2s ease",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
 
-        transform:
-          focused === key
-            ? "translateY(-2px)"
-            : "translateY(0)",
+        transform: focused === key ? "translateY(-2px)" : "translateY(0)",
 
-        boxShadow:
-          focused === key
-            ? "0 10px 30px rgba(22,33,62,0.10)"
-            : "none",
+        boxShadow: focused === key ? "0 10px 30px rgba(22,33,62,0.10)" : "none",
       }}
     >
-      <span className="field-icon-wrap__icon">
-        {icon}
-      </span>
+      <span className="field-icon-wrap__icon">{icon}</span>
 
       {children}
     </div>
@@ -630,10 +623,8 @@ function ContactSection() {
 
           backgroundSize: "50px 50px",
 
-          maskImage:
-            "linear-gradient(to bottom, black, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, black, transparent)",
+          maskImage: "linear-gradient(to bottom, black, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
         }}
       />
 
@@ -724,9 +715,8 @@ function ContactSection() {
                 lineHeight: 1.7,
               }}
             >
-              Whether you found a bug, have an idea,
-              or simply want to know more — we'd love
-              to hear from you.
+              Whether you found a bug, have an idea, or simply want to know more
+              — we'd love to hear from you.
             </p>
           </div>
         </Reveal>
@@ -766,28 +756,22 @@ function ContactSection() {
 
                     padding: "18px 18px",
 
-                    background:
-                      "rgba(255,255,255,0.07)",
+                    background: "rgba(255,255,255,0.07)",
 
-                    border:
-                      "1px solid rgba(255,255,255,0.10)",
+                    border: "1px solid rgba(255,255,255,0.10)",
 
                     backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter:
-                      "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
 
-                    boxShadow:
-                      "0 12px 35px rgba(0,0,0,0.12)",
+                    boxShadow: "0 12px 35px rgba(0,0,0,0.12)",
                   }}
                 >
                   <span
                     className="dot-marker"
                     style={{
-                      background:
-                        "rgba(232,150,61,0.16)",
+                      background: "rgba(232,150,61,0.16)",
                       color: "#E8963D",
-                      border:
-                        "1px solid rgba(232,150,61,0.25)",
+                      border: "1px solid rgba(232,150,61,0.25)",
                     }}
                   >
                     {r.icon}
@@ -810,8 +794,7 @@ function ContactSection() {
                         margin: "5px 0 0",
                         fontSize: 13.5,
                         lineHeight: 1.6,
-                        color:
-                          "rgba(255,255,255,0.60)",
+                        color: "rgba(255,255,255,0.60)",
                       }}
                     >
                       {r.body}
@@ -839,14 +822,11 @@ function ContactSection() {
                   textAlign: "center",
                   padding: 50,
 
-                  background:
-                    "rgba(255,255,255,0.94)",
+                  background: "rgba(255,255,255,0.94)",
 
-                  border:
-                    "1px solid rgba(255,255,255,0.25)",
+                  border: "1px solid rgba(255,255,255,0.25)",
 
-                  boxShadow:
-                    "0 30px 80px rgba(0,0,0,0.22)",
+                  boxShadow: "0 30px 80px rgba(0,0,0,0.22)",
                 }}
               >
                 <div
@@ -860,8 +840,7 @@ function ContactSection() {
 
                     borderRadius: "50%",
 
-                    background:
-                      "rgba(232,150,61,0.12)",
+                    background: "rgba(232,150,61,0.12)",
 
                     color: "#E8963D",
 
@@ -906,18 +885,14 @@ function ContactSection() {
 
                   padding: 28,
 
-                  background:
-                    "rgba(255,255,255,0.96)",
+                  background: "rgba(255,255,255,0.96)",
 
-                  border:
-                    "1px solid rgba(255,255,255,0.25)",
+                  border: "1px solid rgba(255,255,255,0.25)",
 
-                  boxShadow:
-                    "0 30px 80px rgba(0,0,0,0.24)",
+                  boxShadow: "0 30px 80px rgba(0,0,0,0.24)",
 
                   backdropFilter: "blur(14px)",
-                  WebkitBackdropFilter:
-                    "blur(14px)",
+                  WebkitBackdropFilter: "blur(14px)",
                 }}
               >
                 {inputWrap(
@@ -927,13 +902,9 @@ function ContactSection() {
                     className="field-enhanced"
                     placeholder="Your name"
                     required
-                    onFocus={() =>
-                      setFocused("name")
-                    }
-                    onBlur={() =>
-                      setFocused(null)
-                    }
-                  />
+                    onFocus={() => setFocused("name")}
+                    onBlur={() => setFocused(null)}
+                  />,
                 )}
 
                 {inputWrap(
@@ -944,13 +915,9 @@ function ContactSection() {
                     placeholder="Your email"
                     type="email"
                     required
-                    onFocus={() =>
-                      setFocused("email")
-                    }
-                    onBlur={() =>
-                      setFocused(null)
-                    }
-                  />
+                    onFocus={() => setFocused("email")}
+                    onBlur={() => setFocused(null)}
+                  />,
                 )}
 
                 <textarea
@@ -958,12 +925,8 @@ function ContactSection() {
                   placeholder="Message"
                   rows={5}
                   required
-                  onFocus={() =>
-                    setFocused("message")
-                  }
-                  onBlur={() =>
-                    setFocused(null)
-                  }
+                  onFocus={() => setFocused("message")}
+                  onBlur={() => setFocused(null)}
                   style={{
                     resize: "vertical",
                     minHeight: 130,
@@ -1004,7 +967,11 @@ const heroContainerVariants = {
 
 const heroItemVariants = {
   hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 /* ============================================================
@@ -1100,8 +1067,7 @@ function Landing() {
               margin: "22px auto 0",
             }}
           >
-            Upload your papers. Get back the order they
-            should be read in.
+            Upload your papers. Get back the order they should be read in.
           </motion.p>
 
           <motion.div
@@ -1143,7 +1109,6 @@ function Landing() {
                   border: "1.5px solid white",
                 }}
               />
-
               See how it works
             </a>
           </motion.div>
@@ -1160,7 +1125,9 @@ function Landing() {
           <motion.p
             variants={heroItemVariants}
             animate={{ opacity: [0.4, 0.85, 0.4] }}
-            transition={{ opacity: { duration: 2.4, repeat: Infinity, ease: "easeInOut" } }}
+            transition={{
+              opacity: { duration: 2.4, repeat: Infinity, ease: "easeInOut" },
+            }}
             style={{
               fontFamily: "var(--font-mono)",
               fontSize: 11.5,
@@ -1180,8 +1147,7 @@ function Landing() {
       <div
         style={{
           position: "relative",
-          background:
-            "linear-gradient(180deg, #b2cdec 0%, #c3d8ef 100%)",
+          background: "linear-gradient(180deg, #b2cdec 0%, #c3d8ef 100%)",
         }}
       >
         <SectionBlock
@@ -1201,9 +1167,7 @@ function Landing() {
             }}
           >
             <Reveal>
-              <span className="eyebrow">
-                About IntelliResearch
-              </span>
+              <span className="eyebrow">About IntelliResearch</span>
 
               <h2
                 className="fluid-h2"
@@ -1216,21 +1180,34 @@ function Landing() {
               </h2>
             </Reveal>
 
+            {/* FIX: the className that positions each tile inside the
+                CSS grid (about-gallery__large / small-1 / small-2 / wide)
+                is now passed to <Reveal>, since Reveal is the actual
+                direct child of .about-gallery. Previously the class sat
+                one level too deep (on the inner motion.div), so the
+                grid-row/grid-column rules never applied to anything, and
+                every tile — having no other declared height — collapsed
+                to ~0px, producing the big blank gap. The inner tile now
+                gets height: "100%" so it fills whatever size the grid
+                cell (applied via Reveal) actually gives it. */}
             <div className="about-gallery">
               {GALLERY_TILES.map((t, i) => (
-                <Reveal key={t.key} delay={i * 0.08}>
+                <Reveal
+                  key={t.key}
+                  delay={i * 0.08}
+                  className={`about-gallery__${t.key}`}
+                >
                   <motion.div
                     whileHover={{ y: -6 }}
                     transition={{ duration: 0.25 }}
-                    className={`gallery-tile about-gallery__${t.key}`}
+                    className="gallery-tile"
                     style={{
                       backgroundImage: `url(${t.image})`,
+                      height: "100%",
                     }}
                     onClick={() => navigate("/login")}
                   >
-                    <span className="gallery-tile__arrow">
-                      ↗
-                    </span>
+                    <span className="gallery-tile__arrow">↗</span>
 
                     <div className="gallery-tile__label">
                       <div
@@ -1282,11 +1259,9 @@ function Landing() {
                       marginBottom: 30,
                     }}
                   >
-                    Most tools help you find papers.
-                    IntelliResearch helps you understand
-                    them in the right order — mapping which
-                    ideas depend on which, before you start
-                    reading.
+                    Most tools help you find papers. IntelliResearch helps you
+                    understand them in the right order — mapping which ideas
+                    depend on which, before you start reading.
                   </p>
 
                   <div
@@ -1334,8 +1309,7 @@ function Landing() {
                             style={{
                               margin: "3px 0 0",
                               fontSize: 13.5,
-                              color:
-                                "var(--text-muted)",
+                              color: "var(--text-muted)",
                             }}
                           >
                             {f.body}
@@ -1372,9 +1346,7 @@ function Landing() {
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="thumb-chip"
-                      onClick={() =>
-                        navigate("/login")
-                      }
+                      onClick={() => navigate("/login")}
                     >
                       📄 Paper Explorer
                     </motion.div>
@@ -1382,9 +1354,7 @@ function Landing() {
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="thumb-chip"
-                      onClick={() =>
-                        scrollToId("contact")
-                      }
+                      onClick={() => scrollToId("contact")}
                     >
                       💬 Ask a question
                     </motion.div>
@@ -1426,7 +1396,7 @@ function Landing() {
         className="photo-band"
         id="problem"
         style={{
-          backgroundImage: `url(${bandImg})`,
+          backgroundImage: `url(${bandImgs})`,
           position: "relative",
         }}
       >
@@ -1472,12 +1442,10 @@ function Landing() {
                   fontSize: 15.5,
                 }}
               >
-                A collection of papers on a topic isn't
-                a reading list — it's a dependency graph
-                nobody drew for you. IntelliResearch reads
-                the collection once, finds those dependencies,
-                and gives you the order that actually builds
-                understanding.
+                A collection of papers on a topic isn't a reading list — it's a
+                dependency graph nobody drew for you. IntelliResearch reads the
+                collection once, finds those dependencies, and gives you the
+                order that actually builds understanding.
               </p>
 
               <a
@@ -1511,9 +1479,7 @@ function Landing() {
           eyebrow="Build your path"
           title="Turn your papers into a dependency-aware reading order"
           action="HOW IT WORKS"
-          onClick={() =>
-            scrollToId("how-it-works")
-          }
+          onClick={() => scrollToId("how-it-works")}
         />
       </div>
 
@@ -1523,8 +1489,7 @@ function Landing() {
 
       <div
         style={{
-          background:
-            "linear-gradient(180deg, #c3d8ef 0%, #b2cdec 100%)",
+          background: "linear-gradient(180deg, #c3d8ef 0%, #b2cdec 100%)",
         }}
         id="how-it-works"
       >
@@ -1538,9 +1503,7 @@ function Landing() {
           <div className="hero-grid">
             <Reveal>
               <div>
-                <span className="eyebrow">
-                  What you get
-                </span>
+                <span className="eyebrow">What you get</span>
 
                 <h2
                   className="fluid-h2"
@@ -1562,9 +1525,7 @@ function Landing() {
                       transition={{ duration: 0.4, delay: i * 0.06 }}
                       className="checklist-item"
                     >
-                      <span className="checklist-item__check">
-                        ✓
-                      </span>
+                      <span className="checklist-item__check">✓</span>
 
                       <span
                         style={{
@@ -1585,9 +1546,7 @@ function Landing() {
                   style={{
                     marginTop: 24,
                   }}
-                  onClick={() =>
-                    navigate("/login")
-                  }
+                  onClick={() => navigate("/login")}
                 >
                   Try it yourself →
                 </motion.button>
@@ -1620,8 +1579,7 @@ function Landing() {
       <div
         className="ink-surface"
         style={{
-          borderTop:
-            "1px solid var(--border-on-ink)",
+          borderTop: "1px solid var(--border-on-ink)",
         }}
       >
         <div
@@ -1636,20 +1594,17 @@ function Landing() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns:
-                "1.4fr 1fr 1fr",
+              gridTemplateColumns: "1.4fr 1fr 1fr",
               gap: 30,
             }}
           >
             <div>
               <span
                 style={{
-                  fontFamily:
-                    "var(--font-display)",
+                  fontFamily: "var(--font-display)",
                   fontWeight: 700,
                   fontSize: 19,
-                  color:
-                    "var(--text-on-ink)",
+                  color: "var(--text-on-ink)",
                 }}
               >
                 IntelliResearch
@@ -1657,30 +1612,25 @@ function Landing() {
 
               <p
                 style={{
-                  color:
-                    "var(--text-on-ink-muted)",
+                  color: "var(--text-on-ink-muted)",
                   fontSize: 13.5,
                   marginTop: 12,
                   maxWidth: 280,
                   lineHeight: 1.6,
                 }}
               >
-                An AI research assistant that maps
-                prerequisite relationships between
-                papers and builds a reading order —
-                not just a summary.
+                An AI research assistant that maps prerequisite relationships
+                between papers and builds a reading order — not just a summary.
               </p>
             </div>
 
             <div>
               <p
                 style={{
-                  fontFamily:
-                    "var(--font-mono)",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 12,
                   letterSpacing: "0.06em",
-                  color:
-                    "var(--text-on-ink-muted)",
+                  color: "var(--text-on-ink-muted)",
                   marginBottom: 14,
                   textTransform: "uppercase",
                 }}
@@ -1698,8 +1648,7 @@ function Landing() {
                 <a
                   href="#how-it-works"
                   style={{
-                    color:
-                      "var(--text-on-ink-muted)",
+                    color: "var(--text-on-ink-muted)",
                     fontSize: 14,
                   }}
                 >
@@ -1709,8 +1658,7 @@ function Landing() {
                 <a
                   href="/login"
                   style={{
-                    color:
-                      "var(--text-on-ink-muted)",
+                    color: "var(--text-on-ink-muted)",
                     fontSize: 14,
                   }}
                 >
@@ -1722,12 +1670,10 @@ function Landing() {
             <div>
               <p
                 style={{
-                  fontFamily:
-                    "var(--font-mono)",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 12,
                   letterSpacing: "0.06em",
-                  color:
-                    "var(--text-on-ink-muted)",
+                  color: "var(--text-on-ink-muted)",
                   marginBottom: 14,
                   textTransform: "uppercase",
                 }}
@@ -1745,8 +1691,7 @@ function Landing() {
                 <a
                   href="#about"
                   style={{
-                    color:
-                      "var(--text-on-ink-muted)",
+                    color: "var(--text-on-ink-muted)",
                     fontSize: 14,
                   }}
                 >
@@ -1756,8 +1701,7 @@ function Landing() {
                 <a
                   href="#contact"
                   style={{
-                    color:
-                      "var(--text-on-ink-muted)",
+                    color: "var(--text-on-ink-muted)",
                     fontSize: 14,
                   }}
                 >
@@ -1771,15 +1715,12 @@ function Landing() {
             style={{
               marginTop: 40,
               paddingTop: 20,
-              borderTop:
-                "1px solid var(--border-on-ink)",
+              borderTop: "1px solid var(--border-on-ink)",
               fontSize: 12.5,
-              color:
-                "var(--text-on-ink-muted)",
+              color: "var(--text-on-ink-muted)",
             }}
           >
-            IntelliResearch — a research reading-order
-            tool.
+            IntelliResearch — a research reading-order tool.
           </div>
         </div>
       </div>

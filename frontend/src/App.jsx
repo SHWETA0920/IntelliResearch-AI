@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import ResearchSetup from "./pages/ResearchSetup";
 import ResearchWorkspace from "./pages/ResearchWorkspace";
@@ -25,6 +27,8 @@ function AppLayout() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/dashboard" element={<Home />} />
         <Route path="/research/new" element={<ResearchSetup />} />
         <Route path="/research/:id" element={<ResearchWorkspace />} />

@@ -315,58 +315,12 @@ function BookCard({
         />
 
         {/* ====================================================
-            GLASS LABEL
+            GLASS LABEL — removed. Cards no longer show a text
+            heading (e.g. "Learning Path", "Citation Graph",
+            "Prerequisites") overlaid on the image. Everything
+            else about the card (image, gradient, spine, shadow,
+            3D transforms, click-to-select) is unchanged.
         ==================================================== */}
-
-        <div
-          style={{
-            position: "absolute",
-
-            left: 8,
-            right: 8,
-            bottom: 10,
-
-            display: "flex",
-
-            justifyContent: "center",
-
-            pointerEvents: "none",
-          }}
-        >
-          <span
-            style={{
-              color: "#ffffff",
-
-              fontSize: viewportWidth < 600 ? "10px" : "13px",
-
-              fontWeight: 600,
-
-              padding: "7px 11px",
-
-              borderRadius: "9px",
-
-              background: "rgba(0,0,0,0.42)",
-
-              backdropFilter: "blur(11px)",
-
-              WebkitBackdropFilter: "blur(11px)",
-
-              border: "1px solid rgba(255,255,255,0.18)",
-
-              whiteSpace: "nowrap",
-
-              overflow: "hidden",
-
-              textOverflow: "ellipsis",
-
-              maxWidth: "94%",
-
-              textShadow: "0 2px 8px rgba(0,0,0,0.9)",
-            }}
-          >
-            {item.label}
-          </span>
-        </div>
       </motion.div>
     </motion.div>
   );
