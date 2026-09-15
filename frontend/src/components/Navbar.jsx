@@ -22,7 +22,7 @@ function Navbar({ variant = "pill" }) {
         <circle cx="11" cy="6" r="2.6" fill="#3E6FF2" />
         <circle cx="18" cy="14" r="2.2" fill="#7C9EF2" />
       </svg>
-      <span
+      {/* <span
         style={{
           fontFamily: "var(--font-display)",
           fontWeight: 700,
@@ -31,7 +31,7 @@ function Navbar({ variant = "pill" }) {
         }}
       >
         IntelliResearch
-      </span>
+      </span> */}
     </a>
   );
 
