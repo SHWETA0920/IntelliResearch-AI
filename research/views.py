@@ -1,9 +1,8 @@
 import traceback
 
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import viewsets, serializers
 
 from .models import (
     Research,
@@ -29,30 +28,18 @@ class ResearchViewSet(viewsets.ModelViewSet):
     queryset = Research.objects.all().order_by("-created_at")
     serializer_class = ResearchSerializer
 
-    # @action(detail=True, methods=["post"])
-    # def analyze(self, request, pk=None):
-    @action(
-    detail=True,
-    methods=["post"],
-    serializer_class=AnalyzeSerializer,
-)
+
+    @action(detail=True, methods=["post"], serializer_class=AnalyzeSerializer)
     def analyze(self, request, pk=None):
-        """
-        Analyze all papers belonging to a research session.
-        """
+              research = self.get_object()
+              
+              try:
+                  from .services.pipeline import analyze_research
 
-        research = self.get_object()
+                  papers = research.papers.all()
 
-        try:
-            # Import here so Django only loads the pipeline when
-            # the analyze endpoint is actually called.
-            from .services.pipeline import analyze_research
-
-            # Make sure the research has papers
-            papers = research.papers.all()
-
-            if not papers.exists():
-                return Response(
+                  if not papers.exists():
+                      return Response(
                     {
                         "success": False,
                         "research_id": research.id,
@@ -61,18 +48,15 @@ class ResearchViewSet(viewsets.ModelViewSet):
                     status=400,
                 )
 
-            # Mark research as currently being analyzed
-            research.status = "analyzing"
-            research.save(update_fields=["status"])
+                  research.status = "analyzing"
+                  research.save(update_fields=["status"])
 
-            # Run the analysis pipeline
-            result = analyze_research(research)
+                  result = analyze_research(research)
 
-            # Mark as ready after successful analysis
-            research.status = "ready"
-            research.save(update_fields=["status"])
+                  research.status = "ready"
+                  research.save(update_fields=["status"])
 
-            return Response(
+                  return Response(
                 {
                     "success": True,
                     "research_id": research.id,
@@ -82,16 +66,13 @@ class ResearchViewSet(viewsets.ModelViewSet):
                 status=200,
             )
 
-        except Exception as exc:
-            # Print the complete traceback in the Django terminal
-            # so we can see the actual backend error.
-            traceback.print_exc()
+              except Exception as exc:
+                traceback.print_exc()
 
-            # Mark research as failed
-            research.status = "failed"
-            research.save(update_fields=["status"])
+                research.status = "failed"
+                research.save(update_fields=["status"])
 
-            return Response(
+                return Response(
                 {
                     "success": False,
                     "research_id": research.id,
@@ -103,27 +84,84 @@ class ResearchViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def chat(self, request, pk=None):
+        research = self.get_object()
+
+        question = request.data.get("message", "")
+
+        if not question or not question.strip():
+            return Response(
+                {
+                    "answer": "Please ask a question about your research papers.",
+                    "evidence": [],
+                },
+                status=400,
+            )
+
+        try:
+            from .services.chat_service import answer_question
+
+            result = answer_question(research.id, question)
+
+            return Response(result, status=200)
+
+        except Exception as exc:
+            traceback.print_exc()
+
+            return Response(
+                {
+                    "answer": (
+                        "Sorry, something went wrong answering that "
+                        "question. Please try again in a moment."
+                    ),
+                    "evidence": [],
+                    "error": str(exc),
+                },
+                status=500,
+            )
+
+    @action(detail=True, methods=["post"])
+    def chat(self, request, pk=None):
         """
-        Placeholder chat endpoint.
-        Replace the body with the actual RAG/AI service later.
+        Chat endpoint for a research session.
+
+        Answers questions using the analyzed papers belonging to
+        this research session.
         """
 
         research = self.get_object()
 
         question = request.data.get("message", "")
 
-        answer = (
-            f'(placeholder) You asked about "{question}" regarding '
-            f'"{research.topic}". This will be answered by the AI '
-            f"research assistant once it's connected."
-        )
+        if not question or not question.strip():
+            return Response(
+                {
+                    "answer": "Please ask a question about your research papers.",
+                    "evidence": [],
+                },
+                status=400,
+            )
 
-        return Response(
-            {
-                "answer": answer,
-                "evidence": [],
-            }
-        )
+        try:
+            from .services.chat_service import answer_question
+
+            result = answer_question(research.id, question)
+
+            return Response(result, status=200)
+
+        except Exception as exc:
+            traceback.print_exc()
+
+            return Response(
+                {
+                    "answer": (
+                        "Sorry, something went wrong answering that question. "
+                        "Please try again in a moment."
+                    ),
+                    "evidence": [],
+                    "error": str(exc),
+                },
+                status=500,
+            )
 
 
 class PaperViewSet(viewsets.ModelViewSet):

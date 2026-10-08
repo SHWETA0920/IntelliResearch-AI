@@ -26,6 +26,75 @@ const TABS = [
   },
 ];
 
+const DEEP_ANALYSIS_FIELDS = [
+  { key: "problem", label: "Problem" },
+  { key: "method", label: "Method" },
+  { key: "datasets", label: "Datasets" },
+  { key: "key_findings", label: "Key Findings" },
+  { key: "limitations", label: "Limitations" },
+  { key: "novelty", label: "Novelty" },
+  { key: "future_work", label: "Future Work" },
+];
+
+function DeepAnalysisSection({ deep }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const hasStructuredFields = DEEP_ANALYSIS_FIELDS.some(
+    (field) => deep?.[field.key]
+  );
+
+  if (!deep || (!hasStructuredFields && !deep.raw_response)) {
+    return null;
+  }
+
+  return (
+    <div className="deep-analysis">
+      <button
+        type="button"
+        className="deep-analysis-toggle"
+        onClick={() => setExpanded((value) => !value)}
+      >
+        {expanded
+          ? "▲ Hide deep analysis"
+          : "▼ Show deep analysis"}
+      </button>
+
+      {expanded && (
+        <div className="deep-analysis-panel">
+          {deep.error && (
+            <p className="deep-analysis-error">
+              ⚠ {deep.error}
+            </p>
+          )}
+
+          {hasStructuredFields
+            ? DEEP_ANALYSIS_FIELDS.map((field) =>
+                deep[field.key] ? (
+                  <div
+                    className="deep-analysis-field"
+                    key={field.key}
+                  >
+                    <p className="deep-analysis-label">
+                      {field.label}
+                    </p>
+
+                    <p className="deep-analysis-value">
+                      {deep[field.key]}
+                    </p>
+                  </div>
+                ) : null
+              )
+            : deep.raw_response && (
+                <p className="deep-analysis-value">
+                  {deep.raw_response}
+                </p>
+              )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ResearchWorkspace() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -572,76 +641,192 @@ function renderCitations() {
   );
 }
 
+  // function renderAnalysis() {
+  //   return (
+  //     <section className="result-card">
+  //       <div className="result-header">
+  //         <div>
+  //           <span className="result-eyebrow">
+  //             PAPER-BY-PAPER INFORMATION
+  //           </span>
+
+  //           <h2>Paper Analysis</h2>
+
+  //           <p>
+  //             Detailed information and AI-generated
+  //             summaries for your research papers.
+  //           </p>
+  //         </div>
+
+  //         <button
+  //           className="download-button"
+  //           onClick={downloadAnalysis}
+  //         >
+  //           ↓ PDF
+  //         </button>
+  //       </div>
+
+  //       {papers.length === 0 ? (
+  //         <div className="empty-result">
+  //           No papers are available for analysis.
+  //         </div>
+  //       ) : (
+  //         <div className="analysis-list">
+  //           {papers.map((paper, index) => (
+  //             <article
+  //               className="analysis-paper"
+  //               key={paper.id || index}
+  //             >
+  //               <div className="analysis-number">
+  //                 {String(index + 1).padStart(2, "0")}
+  //               </div>
+
+  //               <div className="analysis-content">
+  //                 <div className="analysis-title-row">
+  //                   <h3>
+  //                     {paper.title ||
+  //                       `Paper ${paper.id}`}
+  //                   </h3>
+
+  //                   <span>
+  //                     {getPaperYear(paper)}
+  //                   </span>
+  //                 </div>
+
+  //                 <p className="paper-authors">
+  //                   {paper.authors ||
+  //                     "Authors not available"}
+  //                 </p>
+
+  //                 <div className="analysis-description">
+  //                   {paper.ai_summary ||
+  //                     paper.abstract ||
+  //                     "No paper analysis is available yet."}
+  //                 </div>
+  //               </div>
+  //             </article>
+  //           ))}
+  //         </div>
+  //       )}
+  //     </section>
+  //   );
+  // }
+
   function renderAnalysis() {
-    return (
-      <section className="result-card">
-        <div className="result-header">
-          <div>
-            <span className="result-eyebrow">
-              PAPER-BY-PAPER INFORMATION
-            </span>
+  return (
+    <section className="result-card">
+      <div className="result-header">
+        <div>
+          <span className="result-eyebrow">
+            PAPER-BY-PAPER INFORMATION
+          </span>
 
-            <h2>Paper Analysis</h2>
+          <h2>Paper Analysis</h2>
 
-            <p>
-              Detailed information and AI-generated
-              summaries for your research papers.
-            </p>
-          </div>
-
-          <button
-            className="download-button"
-            onClick={downloadAnalysis}
-          >
-            ↓ PDF
-          </button>
+          <p>
+            Detailed information and AI-generated
+            summaries for your research papers.
+          </p>
         </div>
 
-        {papers.length === 0 ? (
-          <div className="empty-result">
-            No papers are available for analysis.
-          </div>
-        ) : (
-          <div className="analysis-list">
-            {papers.map((paper, index) => (
-              <article
-                className="analysis-paper"
-                key={paper.id || index}
-              >
-                <div className="analysis-number">
-                  {String(index + 1).padStart(2, "0")}
+        <button
+          className="download-button"
+          onClick={downloadAnalysis}
+        >
+          ↓ PDF
+        </button>
+      </div>
+
+      {papers.length === 0 ? (
+        <div className="empty-result">
+          No papers are available for analysis.
+        </div>
+      ) : (
+        <div className="analysis-list">
+          {papers.map((paper, index) => (
+            <article
+              className="analysis-paper"
+              key={paper.id || index}
+            >
+              <div className="analysis-number">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+
+              <div className="analysis-content">
+                <div className="analysis-title-row">
+                  <h3>
+                    {paper.title || `Paper ${paper.id}`}
+                  </h3>
+
+                  <span>
+                    {getPaperYear(paper)}
+                  </span>
                 </div>
 
-                <div className="analysis-content">
-                  <div className="analysis-title-row">
-                    <h3>
-                      {paper.title ||
-                        `Paper ${paper.id}`}
-                    </h3>
-
-                    <span>
-                      {getPaperYear(paper)}
-                    </span>
-                  </div>
-
+                {paper.authors && (
                   <p className="paper-authors">
-                    {paper.authors ||
-                      "Authors not available"}
+                    {paper.authors}
                   </p>
+                )}
 
-                  <div className="analysis-description">
-                    {paper.ai_summary ||
+                <div className="analysis-description">
+                  {(() => {
+                    const keyPoints =
+                      paper.raw_ai_data?.key_points;
+
+                    const analysisError =
+                      paper.raw_ai_data?.error;
+
+                    if (
+                      Array.isArray(keyPoints) &&
+                      keyPoints.length > 0
+                    ) {
+                      return (
+                        <ul className="key-points-list">
+                          {keyPoints.map((point, i) => (
+                            <li key={i}>
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      );
+                    }
+
+                    if (analysisError) {
+                      return (
+                        <span className="analysis-error-text">
+                          ⚠ {analysisError}
+                        </span>
+                      );
+                    }
+
+                    if (research?.status === "analyzing") {
+                      return (
+                        <span className="analysis-pending">
+                          Extracting key points...
+                        </span>
+                      );
+                    }
+
+                    return (
+                      paper.ai_summary ||
                       paper.abstract ||
-                      "No paper analysis is available yet."}
-                  </div>
+                      "No paper analysis is available yet."
+                    );
+                  })()}
                 </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
-    );
-  }
+
+                <DeepAnalysisSection
+                  deep={paper.raw_ai_data?.deep_analysis}
+                />
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 
   async function logout() {
     try {

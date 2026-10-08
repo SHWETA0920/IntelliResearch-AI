@@ -429,11 +429,11 @@ function LearningPath({
                         STEP {index + 1}
                       </span>
 
-                      <h3>
+                      
                         <h3>
   {getPaperTitle(paper)}
 </h3>
-                      </h3>
+                      
 
                       <p>
                         {getAuthors(paper)}
