@@ -132,3 +132,18 @@ MAILERS = {
 }
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# LLM configuration
+import os
+
+LLM_BASE_URL = os.getenv(
+    "LLM_BASE_URL",
+    "https://api.groq.com/openai/v1"
+)
+
+LLM_MODEL = os.getenv(
+    "LLM_MODEL",
+    "openai/gpt-oss-120b"
+)
+
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")

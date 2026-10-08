@@ -496,3 +496,87 @@ code {
     height: 48px;
   }
 }
+/* =========================================================
+   AI ASSISTANT - FORCE DARK THEME
+   ========================================================= */
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #080808 !important;
+}
+
+/* AI Assistant page */
+.ai-assistant-page {
+  min-height: 100vh !important;
+  width: 100% !important;
+
+  background-color: #080808 !important;
+  color: #f4efe7 !important;
+}
+
+/* Main assistant container */
+.ai-assistant-page > *,
+.ai-assistant-page section,
+.ai-assistant-page main,
+.ai-assistant-page div {
+  color: inherit;
+}
+
+/* Black glass card */
+.ai-assistant-page .glass-card,
+.ai-assistant-page .ai-assistant-card {
+  background: rgba(8, 8, 8, 0.88) !important;
+
+  border: 1px solid rgba(230, 145, 35, 0.42) !important;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+/* Inputs */
+.ai-assistant-page input,
+.ai-assistant-page textarea {
+  background: rgba(0, 0, 0, 0.75) !important;
+  color: #f4efe7 !important;
+  border-color: rgba(230, 145, 35, 0.4) !important;
+}
+
+.ai-assistant-page input::placeholder,
+.ai-assistant-page textarea::placeholder {
+  color: rgba(244, 239, 231, 0.4) !important;
+}
+
+/* Text */
+.ai-assistant-page h1,
+.ai-assistant-page h2,
+.ai-assistant-page h3,
+.ai-assistant-page p,
+.ai-assistant-page span,
+.ai-assistant-page label {
+  color: inherit;
+}
+
+/* Orange headings */
+.ai-assistant-page .ai-assistant-eyebrow {
+  color: #e69123 !important;
+}
+
+/* Buttons */
+.ai-assistant-page button {
+  color: #f4efe7;
+}
+
+.ai-assistant-page .ai-send-button {
+  background: #e69123 !important;
+  color: #080808 !important;
+}
