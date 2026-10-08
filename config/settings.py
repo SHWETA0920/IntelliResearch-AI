@@ -133,7 +133,6 @@ MAILERS = {
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# LLM configuration
 import os
 
 LLM_BASE_URL = os.getenv(
