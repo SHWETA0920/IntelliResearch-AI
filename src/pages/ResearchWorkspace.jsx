@@ -1,431 +1,972 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
-import ReactFlow, { Background, Controls, MarkerType } from "reactflow";
-import "reactflow/dist/style.css";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/client";
-import "../styles/theme.css";
+import "../styles/ResearchWorkspace.css";
+import researchBackground from "../assets/workspace-background.png";
+import LearningPath from "../components/LearningPath";
+import CitationGraph from "../components/CitationGraph";
 
-const STATUS_BADGE = {
-  pending: "badge-yellow",
-  analyzing: "badge-purple",
-  ready: "badge-teal",
-  failed: "badge-coral",
-};
+const TABS = [
+  {
+    id: "learning",
+    icon: "↗",
+    title: "Learning Path",
+    description: "Recommended reading order",
+  },
+  {
+    id: "citations",
+    icon: "❝",
+    title: "Citations",
+    description: "Paper reference relationships",
+  },
+  {
+    id: "analysis",
+    icon: "▤",
+    title: "Paper Analysis",
+    description: "Paper-by-paper information",
+  },
+];
 
-function ResearchWorkspace() {
-  const { id } = useParams();
+const DEEP_ANALYSIS_FIELDS = [
+  { key: "problem", label: "Problem" },
+  { key: "method", label: "Method" },
+  { key: "datasets", label: "Datasets" },
+  { key: "key_findings", label: "Key Findings" },
+  { key: "limitations", label: "Limitations" },
+  { key: "novelty", label: "Novelty" },
+  { key: "future_work", label: "Future Work" },
+];
 
-  const [research, setResearch] = useState(null);
-  const [prerequisites, setPrerequisites] = useState([]);
-  const [citations, setCitations] = useState([]);
-  const [concepts, setConcepts] = useState([]);
-  const [paperConcepts, setPaperConcepts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState("path");
-  const [selectedPaper, setSelectedPaper] = useState(null);
-  const pollRef = useRef(null);
+function DeepAnalysisSection({ deep }) {
+  const [expanded, setExpanded] = useState(false);
 
-  const fetchAll = useCallback(() => {
-    Promise.all([
-      api.getResearch(id),
-      api.listPrerequisites(id),
-      api.listCitations(id),
-      api.listConcepts(id),
-      api.listPaperConcepts(id),
-    ])
-      .then(([researchData, prereqData, citationData, conceptData, paperConceptData]) => {
-        setResearch(researchData);
-        setPrerequisites(prereqData);
-        setCitations(citationData);
-        setConcepts(conceptData);
-        setPaperConcepts(paperConceptData);
-        setLoading(false);
-        if (researchData.status === "ready" || researchData.status === "failed") {
-          clearInterval(pollRef.current);
-        }
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-        clearInterval(pollRef.current);
-      });
-  }, [id]);
-
-  useEffect(() => {
-    fetchAll();
-    pollRef.current = setInterval(fetchAll, 3000);
-    return () => clearInterval(pollRef.current);
-  }, [fetchAll]);
-
-  if (loading) return <div style={{ padding: 60 }}>Loading research session...</div>;
-  if (error) return <div style={{ padding: 60 }}>Error: {error}</div>;
-  if (!research) return <div style={{ padding: 60 }}>Not found.</div>;
-
-  const isAnalyzing = research.status === "pending" || research.status === "analyzing";
-
-  const TABS = [
-    { key: "path", label: "Learning Path" },
-    { key: "knowledge", label: "Knowledge Graph" },
-    { key: "citations", label: "Citation Graph" },
-    { key: "papers", label: "Papers" },
-  ];
-
-  return (
-    <div style={{ minHeight: "100vh" }}>
-      <div className="container" style={{ paddingTop: 24 }}>
-        <div className="pill-nav">
-          <Link to="/dashboard" style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 18, color: "var(--signal)" }}>
-            ← Dashboard
-          </Link>
-          <Link to={`/research/${id}/papers`} className="nav-link" style={{ fontWeight: 600, color: "var(--signal)" }}>
-            Open Paper Explorer →
-          </Link>
-        </div>
-      </div>
-
-      <div className="container" style={{ marginTop: 30 }}>
-        <div className="card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
-            <div>
-              <h1 style={{ fontSize: 30, margin: 0 }}>{research.topic}</h1>
-              <p style={{ color: "var(--text-muted)", marginTop: 6 }}>
-                {research.papers.length} paper(s)
-              </p>
-            </div>
-            <span className={`badge ${STATUS_BADGE[research.status]}`} style={{ fontSize: 13, padding: "6px 16px" }}>
-              {research.status}
-            </span>
-          </div>
-        </div>
-
-        {isAnalyzing && (
-          <div className="card" style={{ marginTop: 20, borderLeft: "4px solid var(--signal)" }}>
-            <p style={{ margin: 0, fontWeight: 600 }}>
-              {research.status === "pending" ? "⏳ Queued for analysis..." : "🔄 Analyzing your research... this can take a minute."}
-            </p>
-          </div>
-        )}
-
-        {research.status === "failed" && (
-          <div className="card" style={{ marginTop: 20, borderLeft: "4px solid var(--coral)" }}>
-            <p style={{ margin: 0, color: "#E14B4B", fontWeight: 600 }}>Analysis failed. Please try again.</p>
-          </div>
-        )}
-
-        {research.status === "ready" && (
-          <>
-            <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
-              {TABS.map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => setActiveTab(t.key)}
-                  className={activeTab === t.key ? "btn btn-primary" : "btn btn-outline"}
-                  style={{ padding: "10px 20px", fontSize: 14 }}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="workspace-layout" style={{ marginTop: 20 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-                  {activeTab === "path" && (
-                    <LearningPathGraph
-                      papers={research.papers}
-                      prerequisites={prerequisites}
-                      onNodeClick={(paperId) => setSelectedPaper(paperId)}
-                    />
-                  )}
-                  {activeTab === "knowledge" && (
-                    <KnowledgeGraph
-                      papers={research.papers}
-                      concepts={concepts}
-                      paperConcepts={paperConcepts}
-                      onPaperClick={(paperId) => setSelectedPaper(paperId)}
-                    />
-                  )}
-                  {activeTab === "citations" && (
-                    <CitationGraph
-                      papers={research.papers}
-                      citations={citations}
-                      onNodeClick={(paperId) => setSelectedPaper(paperId)}
-                    />
-                  )}
-                  {activeTab === "papers" && (
-                    <div style={{ padding: 24 }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
-                        {research.papers.map((paper) => (
-                          <div
-                            key={paper.id}
-                            onClick={() => setSelectedPaper(paper.id)}
-                            style={{
-                              padding: 16,
-                              borderRadius: 12,
-                              border: "1px solid var(--border)",
-                              cursor: "pointer",
-                              background: "var(--primary-light)",
-                            }}
-                          >
-                            <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
-                              📄 {paper.title || paper.file.split("/").pop()}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {selectedPaper && (
-                <PaperDrawer
-                  paperId={selectedPaper}
-                  papers={research.papers}
-                  prerequisites={prerequisites}
-                  citations={citations}
-                  onClose={() => setSelectedPaper(null)}
-                />
-              )}
-            </div>
-          </>
-        )}
-      </div>
-      <div style={{ height: 60 }} />
-    </div>
+  const hasStructuredFields = DEEP_ANALYSIS_FIELDS.some(
+    (field) => deep?.[field.key]
   );
-}
 
-const nodeStyle = {
-  background: "white",
-  color: "var(--text-dark)",
-  border: "1.5px solid var(--signal)",
-  borderRadius: 12,
-  padding: 12,
-  width: 190,
-  cursor: "pointer",
-  fontWeight: 600,
-  fontSize: 13,
-  boxShadow: "0 4px 10px rgba(62,111,242,0.14)",
-};
-
-function LearningPathGraph({ papers, prerequisites, onNodeClick }) {
-  if (papers.length === 0) return <p style={{ padding: 24 }}>No papers to show.</p>;
-
-  const nodes = papers.map((paper, i) => ({
-    id: String(paper.id),
-    position: { x: i * 240, y: 100 },
-    data: { label: `📄 ${paper.title || paper.file.split("/").pop()}` },
-    style: nodeStyle,
-  }));
-
-  // Ember, deliberately matching the hero's "reading path" color - the
-  // Learning Path tab is the same concept the landing page introduces.
-  const edges = prerequisites.map((p) => ({
-    id: `e${p.id}`,
-    source: String(p.prerequisite_paper),
-    target: String(p.paper),
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#E8963D" },
-    style: { stroke: "#E8963D", strokeWidth: 2.5 },
-  }));
-
-  return (
-    <div style={{ height: 420 }}>
-      <ReactFlow nodes={nodes} edges={edges} fitView onNodeClick={(event, node) => onNodeClick(node.id)}>
-        <Background color="#E4DFD1" gap={18} />
-        <Controls />
-      </ReactFlow>
-    </div>
-  );
-}
-
-function CitationGraph({ papers, citations, onNodeClick }) {
-  if (papers.length === 0) return <p style={{ padding: 24 }}>No papers to show.</p>;
-
-  const nodes = papers.map((paper, i) => ({
-    id: String(paper.id),
-    position: { x: i * 240, y: 100 },
-    data: { label: `📄 ${paper.title || paper.file.split("/").pop()}` },
-    style: nodeStyle,
-  }));
-
-  const edges = citations.map((c) => ({
-    id: `c${c.id}`,
-    source: String(c.citing_paper),
-    target: String(c.cited_paper),
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#3E6FF2" },
-    style: { stroke: "#3E6FF2", strokeWidth: 2 },
-    label: "cites",
-    labelStyle: { fill: "#3E6FF2", fontWeight: 700, fontSize: 12, fontFamily: "'JetBrains Mono', monospace" },
-  }));
-
-  return (
-    <div style={{ height: 420 }}>
-      <ReactFlow nodes={nodes} edges={edges} fitView onNodeClick={(event, node) => onNodeClick(node.id)}>
-        <Background color="#E4DFD1" gap={18} />
-        <Controls />
-      </ReactFlow>
-    </div>
-  );
-}
-
-function KnowledgeGraph({ papers, concepts, paperConcepts, onPaperClick }) {
-  if (concepts.length === 0) {
-    return <p style={{ padding: 24, color: "var(--text-muted)" }}>No concepts recorded yet.</p>;
+  if (!deep || (!hasStructuredFields && !deep.raw_response)) {
+    return null;
   }
 
-  const paperNodes = papers.map((paper, i) => ({
-    id: `paper-${paper.id}`,
-    position: { x: i * 240, y: 40 },
-    data: { label: `📄 ${paper.title || paper.file.split("/").pop()}` },
-    style: nodeStyle,
-  }));
-
-  const conceptNodes = concepts.map((concept, i) => ({
-    id: `concept-${concept.id}`,
-    position: { x: i * 240, y: 280 },
-    data: { label: concept.name },
-    style: {
-      background: "#E8963D",
-      color: "#3A2409",
-      border: "none",
-      borderRadius: "50%",
-      padding: 10,
-      width: 130,
-      height: 130,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      textAlign: "center",
-      fontWeight: 700,
-      fontSize: 13,
-      boxShadow: "0 4px 14px rgba(232,150,61,0.4)",
-    },
-  }));
-
-  const edges = paperConcepts.map((pc) => {
-    const isIntroduces = pc.role === "introduces";
-    return {
-      id: `pc${pc.id}`,
-      source: isIntroduces ? `paper-${pc.paper}` : `concept-${pc.concept}`,
-      target: isIntroduces ? `concept-${pc.concept}` : `paper-${pc.paper}`,
-      markerEnd: { type: MarkerType.ArrowClosed, color: isIntroduces ? "#2ED9C3" : "#FF6B6B" },
-      style: { stroke: isIntroduces ? "#2ED9C3" : "#FF6B6B", strokeWidth: 2 },
-      label: isIntroduces ? "introduces" : "requires",
-      labelStyle: { fontWeight: 700, fontSize: 12, fill: isIntroduces ? "#1AA893" : "#E14B4B", fontFamily: "'JetBrains Mono', monospace" },
-    };
-  });
-
   return (
-    <div style={{ height: 460 }}>
-      <ReactFlow
-        nodes={[...paperNodes, ...conceptNodes]}
-        edges={edges}
-        fitView
-        onNodeClick={(event, node) => {
-          if (node.id.startsWith("paper-")) onPaperClick(node.id.replace("paper-", ""));
-        }}
+    <div className="deep-analysis">
+      <button
+        type="button"
+        className="deep-analysis-toggle"
+        onClick={() => setExpanded((value) => !value)}
       >
-        <Background color="#E4DFD1" gap={18} />
-        <Controls />
-      </ReactFlow>
+        {expanded
+          ? "▲ Hide deep analysis"
+          : "▼ Show deep analysis"}
+      </button>
+
+      {expanded && (
+        <div className="deep-analysis-panel">
+          {deep.error && (
+            <p className="deep-analysis-error">
+              ⚠ {deep.error}
+            </p>
+          )}
+
+          {hasStructuredFields
+            ? DEEP_ANALYSIS_FIELDS.map((field) =>
+                deep[field.key] ? (
+                  <div
+                    className="deep-analysis-field"
+                    key={field.key}
+                  >
+                    <p className="deep-analysis-label">
+                      {field.label}
+                    </p>
+
+                    <p className="deep-analysis-value">
+                      {deep[field.key]}
+                    </p>
+                  </div>
+                ) : null
+              )
+            : deep.raw_response && (
+                <p className="deep-analysis-value">
+                  {deep.raw_response}
+                </p>
+              )}
+        </div>
+      )}
     </div>
   );
 }
 
-function PaperDrawer({ paperId, papers, prerequisites, citations, onClose }) {
-  const paper = papers.find((p) => String(p.id) === String(paperId));
-  if (!paper) return null;
 
-  const requires = prerequisites.filter((p) => String(p.paper) === String(paperId));
-  const citesOut = citations.filter((c) => String(c.citing_paper) === String(paperId));
-  const citedByIn = citations.filter((c) => String(c.cited_paper) === String(paperId));
 
-  const findTitle = (pid) => {
-    const p = papers.find((pp) => String(pp.id) === String(pid));
-    return p ? (p.title || p.file.split("/").pop()) : `Paper #${pid}`;
-  };
+export default function ResearchWorkspace() {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  return (
-    <div className="card workspace-drawer" style={{ height: "fit-content" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <h3 style={{ margin: 0, fontSize: 16 }}>{paper.title || paper.file.split("/").pop()}</h3>
-        <span onClick={onClose} style={{ cursor: "pointer", fontSize: 20, color: "var(--text-muted)" }}>
-          ×
-        </span>
+  const [research, setResearch] = useState(null);
+  const [papers, setPapers] = useState([]);
+  const [concepts, setConcepts] = useState([]);
+  const [prerequisites, setPrerequisites] = useState([]);
+  const [citations, setCitations] = useState([]);
+
+  const [activeTab, setActiveTab] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadResearch();
+  }, [id]);
+
+async function loadResearch() {
+  setLoading(true);
+  setError("");
+
+  try {
+
+          const [
+        researchResponse,
+        papersResponse,
+        conceptsResponse,
+        prerequisitesResponse,
+        citationsResponse,
+      ] = await Promise.all([
+        api.getResearch(id),
+        api.listPapers(id),
+        api.listConcepts(id),
+        api.listPrerequisites(id),
+        api.listCitations(id),
+      ]);
+
+      setResearch(researchResponse);
+
+      setPapers(
+        Array.isArray(papersResponse)
+          ? papersResponse
+          : papersResponse?.results || []
+      );
+
+      setConcepts(
+        Array.isArray(conceptsResponse)
+          ? conceptsResponse
+          : conceptsResponse?.results || []
+      );
+
+      setPrerequisites(
+        Array.isArray(prerequisitesResponse)
+          ? prerequisitesResponse
+          : prerequisitesResponse?.results || []
+      );
+
+      setCitations(
+        Array.isArray(citationsResponse)
+          ? citationsResponse
+          : citationsResponse?.results || []
+      );
+
+  } catch (err) {
+    console.error("Research workspace error:", err);
+    setError("Unable to load this research workspace.");
+  } finally {
+    setLoading(false);
+  }
+}
+
+  const conceptCount = useMemo(() => {
+    if (concepts.length) {
+      return concepts.length;
+    }
+
+    const unique = new Set();
+
+    papers.forEach((paper) => {
+      if (Array.isArray(paper.concepts)) {
+        paper.concepts.forEach((concept) => {
+          unique.add(
+            typeof concept === "object"
+              ? concept.id || concept.name
+              : concept
+          );
+        });
+      }
+    });
+
+    return unique.size;
+  }, [concepts, papers]);
+
+function getPaperTitle(value) {
+  const paperId =
+    value && typeof value === "object"
+      ? value.id
+      : value;
+
+  const paper = papers.find(
+    (item) => String(item.id) === String(paperId)
+  );
+
+  if (!paper) {
+    return `Paper ${paperId ?? "Unknown"}`;
+  }
+
+  if (paper.title?.trim()) {
+    return paper.title.trim();
+  }
+
+  if (paper.name?.trim()) {
+    return paper.name.trim();
+  }
+
+  if (paper.file) {
+    const filename = paper.file
+      .split("/")
+      .pop()
+      .split("?")[0];
+
+    return decodeURIComponent(filename)
+      .replace(/\.pdf$/i, "")
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  return `Paper ${paper.id}`;
+}
+
+  function getPrerequisiteTarget(item) {
+    return item.paper || item.paper_id || item.target;
+  }
+
+  function getCitationSource(item) {
+    return (
+      item.citing_paper ||
+      item.citing_paper_id ||
+      item.source
+    );
+  }
+
+  function getCitationTarget(item) {
+    return (
+      item.cited_paper ||
+      item.cited_paper_id ||
+      item.target
+    );
+  }
+
+  const learningPath = papers;
+
+  function handleTabClick(tabId) {
+    setActiveTab((current) =>
+      current === tabId ? null : tabId
+    );
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function printAsPdf(title, content) {
+    const printableWindow = window.open(
+      "",
+      "_blank",
+      "width=900,height=700"
+    );
+
+    if (!printableWindow) {
+      alert("Please allow pop-ups to download the PDF.");
+      return;
+    }
+
+    printableWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${escapeHtml(title)}</title>
+
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 40px;
+              color: #0e1526;
+              line-height: 1.6;
+            }
+
+            h1 {
+              color: #e8963d;
+              margin-bottom: 8px;
+            }
+
+            h2 {
+              margin-top: 30px;
+            }
+
+            .meta {
+              color: #687083;
+              margin-bottom: 30px;
+            }
+
+            .item {
+              padding: 14px 0;
+              border-bottom: 1px solid #ddd;
+              page-break-inside: avoid;
+            }
+
+            .item:last-child {
+              border-bottom: none;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+
+            th,
+            td {
+              border: 1px solid #ddd;
+              padding: 10px;
+              text-align: left;
+            }
+
+            th {
+              background: #f4eee6;
+            }
+
+            @media print {
+              body {
+                padding: 20px;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          ${content}
+        </body>
+      </html>
+    `);
+
+    printableWindow.document.close();
+
+    setTimeout(() => {
+      printableWindow.focus();
+      printableWindow.print();
+    }, 300);
+  }
+
+  function downloadLearningPath() {
+    const content = `
+      <h1>Learning Path</h1>
+
+      <div class="meta">
+        Research:
+        ${escapeHtml(research?.topic || "Research")}
       </div>
 
-      {paper.authors && (
-        <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 6 }}>
-          {paper.authors}
-          {paper.year ? ` • ${paper.year}` : ""}
-        </p>
-      )}
+      ${
+        learningPath.length
+          ? learningPath
+              .map(
+                (paper, index) => `
+                  <div class="item">
+                    <strong>
+                      ${index + 1}. 
+                      ${escapeHtml(
+                        paper.title || `Paper ${paper.id}`
+                      )}
+                    </strong>
 
-      {paper.abstract && (
-        <>
-          <p style={sectionLabel}>Abstract</p>
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{paper.abstract}</p>
-        </>
-      )}
+                    <br />
 
-      {paper.ai_summary && (
-        <>
-          <p style={sectionLabel}>AI Summary</p>
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{paper.ai_summary}</p>
-        </>
-      )}
+                    Authors:
+                    ${escapeHtml(
+                      paper.authors ||
+                        "Authors not available"
+                    )}
 
-      <p style={sectionLabel}>Why this paper is here</p>
-      {requires.length === 0 ? (
-        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>No prerequisites recorded.</p>
-      ) : (
-        requires.map((r) => (
-          <div key={r.id} style={{ background: "#FDF0DE", borderRadius: 10, padding: 10, marginBottom: 8 }}>
-            <p style={{ margin: 0, fontSize: 12 }}>
-              Requires: <strong>{findTitle(r.prerequisite_paper)}</strong>
-            </p>
-            {r.reason && <p style={{ margin: "4px 0 0", fontSize: 11, opacity: 0.85 }}>{r.reason}</p>}
-            {r.confidence != null && (
-              <p style={{ margin: "4px 0 0", fontSize: 11, opacity: 0.75, fontFamily: "var(--font-mono)" }}>
-                Confidence: {Math.round(r.confidence * 100)}%
-              </p>
-            )}
-          </div>
-        ))
-      )}
+                    <br />
 
-      <p style={sectionLabel}>Citations</p>
-      {citesOut.length === 0 && citedByIn.length === 0 ? (
-        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>No citation links recorded.</p>
-      ) : (
-        <>
-          {citesOut.map((c) => (
-            <p key={c.id} style={{ fontSize: 13 }}>
-              Cites: <strong>{findTitle(c.cited_paper)}</strong>
-            </p>
-          ))}
-          {citedByIn.map((c) => (
-            <p key={c.id} style={{ fontSize: 13 }}>
-              Cited by: <strong>{findTitle(c.citing_paper)}</strong>
-            </p>
-          ))}
-        </>
-      )}
-    </div>
+                    Year:
+                    ${escapeHtml(
+                      getPaperYear(paper)
+                    )}
+                  </div>
+                `
+              )
+              .join("")
+          : "<p>No learning path information is available.</p>"
+      }
+    `;
+
+    printAsPdf("Learning Path", content);
+  }
+
+  function downloadCitations() {
+    const content = `
+      <h1>Citations</h1>
+
+      <div class="meta">
+        Research:
+        ${escapeHtml(research?.topic || "Research")}
+      </div>
+
+      ${
+        citations.length
+          ? `
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Paper</th>
+                  <th>References</th>
+                  <p>
+  These papers reference each other based on the
+  relationships detected during analysis.
+</p>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${citations
+                  .map((citation, index) => {
+                    const source =
+                      getCitationSource(citation);
+
+                    const target =
+                      getCitationTarget(citation);
+
+                    return `
+                      <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                          ${escapeHtml(
+                            getPaperTitle(source)
+                          )}
+                        </td>
+                        <td>
+                          ${escapeHtml(
+                            getPaperTitle(target)
+                          )}
+                        </td>
+                      </tr>
+                    `;
+                  })
+                  .join("")}
+              </tbody>
+            </table>
+          `
+          : "<p>No citation relationships were found.</p>"
+      }
+    `;
+
+    printAsPdf("Citations", content);
+  }
+
+  function downloadAnalysis() {
+    const content = `
+      <h1>Paper Analysis</h1>
+
+      <div class="meta">
+        Research:
+        ${escapeHtml(research?.topic || "Research")}
+      </div>
+
+      ${
+        papers.length
+          ? papers
+              .map(
+                (paper, index) => `
+                  <div class="item">
+                    <strong>
+                      ${index + 1}.
+                      ${escapeHtml(
+                        paper.title ||
+                          `Paper ${paper.id}`
+                      )}
+                    </strong>
+
+                    <p>
+                      <strong>Authors:</strong>
+                      ${escapeHtml(
+                        paper.authors ||
+                          "Authors not available"
+                      )}
+                    </p>
+
+                    <p>
+                      <strong>Year:</strong>
+                      ${escapeHtml(
+                        getPaperYear(paper)
+                      )}
+                    </p>
+
+                    <p>
+                      <strong>Analysis:</strong>
+                      ${escapeHtml(
+                        paper.ai_summary ||
+                          paper.abstract ||
+                          "No paper analysis is available yet."
+                      )}
+                    </p>
+                  </div>
+                `
+              )
+              .join("")
+          : "<p>No papers are available for analysis.</p>"
+      }
+    `;
+
+    printAsPdf("Paper Analysis", content);
+  }
+
+const getPaperById = (paperOrId) => {
+  if (!paperOrId) return null;
+
+  const id =
+    typeof paperOrId === "object"
+      ? paperOrId.id
+      : paperOrId;
+
+  return papers.find(
+    (paper) => String(paper.id) === String(id)
+  );
+};
+
+
+const getPaperAuthors = (paperOrId) => {
+  const paper = getPaperById(paperOrId);
+
+  return paper?.authors || "Authors not available";
+};
+
+const getPaperYear = (paperOrId) => {
+  const paper = getPaperById(paperOrId);
+
+  return (
+    paper?.year ||
+    paper?.publication_year ||
+    "—"
+  );
+};
+
+function renderCitations() {
+  return (
+    <section className="result-card">
+      <div className="result-header">
+        <div>
+          <span className="result-eyebrow">
+            RESEARCH REFERENCES
+          </span>
+
+          <h2>Citations</h2>
+
+          <p>
+            Explore paper-to-paper citation relationships
+            and each paper's relevance assessment.
+          </p>
+        </div>
+
+        <button
+          className="download-button"
+          onClick={downloadCitations}
+        >
+          ↓ PDF
+        </button>
+      </div>
+
+      <CitationGraph
+        papers={papers}
+        citations={citations}
+      />
+    </section>
   );
 }
 
-const sectionLabel = {
-  fontWeight: 700,
-  fontSize: 12,
-  textTransform: "uppercase",
-  letterSpacing: 0.5,
-  color: "var(--signal)",
-  marginTop: 18,
-  marginBottom: 6,
-  fontFamily: "var(--font-mono)",
-};
 
-export default ResearchWorkspace;
+  function renderAnalysis() {
+  return (
+    <section className="result-card">
+      <div className="result-header">
+        <div>
+          <span className="result-eyebrow">
+            PAPER-BY-PAPER INFORMATION
+          </span>
+
+          <h2>Paper Analysis</h2>
+
+          <p>
+            Detailed information and AI-generated
+            summaries for your research papers.
+          </p>
+        </div>
+
+        <button
+          className="download-button"
+          onClick={downloadAnalysis}
+        >
+          ↓ PDF
+        </button>
+      </div>
+
+      {papers.length === 0 ? (
+        <div className="empty-result">
+          No papers are available for analysis.
+        </div>
+      ) : (
+        <div className="analysis-list">
+          {papers.map((paper, index) => (
+            <article
+              className="analysis-paper"
+              key={paper.id || index}
+            >
+              <div className="analysis-number">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+
+              <div className="analysis-content">
+                <div className="analysis-title-row">
+                  <h3>
+                    {paper.title || `Paper ${paper.id}`}
+                  </h3>
+
+                  <span>
+                    {getPaperYear(paper)}
+                  </span>
+                </div>
+
+                {paper.authors && (
+                  <p className="paper-authors">
+                    {paper.authors}
+                  </p>
+                )}
+
+                <div className="analysis-description">
+                  {(() => {
+                    const keyPoints =
+                      paper.raw_ai_data?.key_points;
+
+                    const analysisError =
+                      paper.raw_ai_data?.error;
+
+                    if (
+                      Array.isArray(keyPoints) &&
+                      keyPoints.length > 0
+                    ) {
+                      return (
+                        <ul className="key-points-list">
+                          {keyPoints.map((point, i) => (
+                            <li key={i}>
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      );
+                    }
+
+                    if (analysisError) {
+                      return (
+                        <span className="analysis-error-text">
+                          ⚠ {analysisError}
+                        </span>
+                      );
+                    }
+
+                    if (research?.status === "analyzing") {
+                      return (
+                        <span className="analysis-pending">
+                          Extracting key points...
+                        </span>
+                      );
+                    }
+
+                    return (
+                      paper.ai_summary ||
+                      paper.abstract ||
+                      "No paper analysis is available yet."
+                    );
+                  })()}
+                </div>
+
+                <DeepAnalysisSection
+                  deep={paper.raw_ai_data?.deep_analysis}
+                />
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+  async function logout() {
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+    } finally {
+      navigate("/login");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div
+        className="workspace-loading"
+        style={{
+          backgroundImage: `url(${researchBackground})`,
+        }}
+      >
+        <div className="loading-glass-card">
+          <div className="loading-spinner" />
+          <p>Loading research workspace...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <main
+      className="research-workspace"
+      style={{
+        backgroundImage: `url(${researchBackground})`,
+      }}
+    >
+      <div className="workspace-overlay" />
+
+      <div className="workspace-content">
+        {/* TOP NAVIGATION */}
+        <header className="workspace-topbar glass-card">
+          <div className="brand">
+            <span className="brand-mark">▰</span>
+
+            <span className="brand-name">
+              IntelliResearch
+            </span>
+          </div>
+
+          <div className="topbar-topic">
+            {research?.topic || "Research Workspace"}
+          </div>
+
+          <button
+            className="logout-button"
+            onClick={logout}
+          >
+            ↪ Logout
+          </button>
+        </header>
+
+        {/* HERO */}
+        <section className="workspace-hero glass-card">
+          <div className="hero-copy">
+            <span className="hero-label">
+              YOUR RESEARCH WORKSPACE
+            </span>
+
+            <h1>Welcome back!</h1>
+
+            <p>
+              Explore your research journey for{" "}
+              <strong>
+                {research?.topic || "your research"}
+              </strong>
+            </p>
+
+            <div className="hero-meta">
+              <span>
+                {papers.length} Papers
+              </span>
+
+              <span className="meta-divider">
+                •
+              </span>
+
+              <span>
+                {conceptCount} Concepts
+              </span>
+
+              <span className="meta-divider">
+                •
+              </span>
+
+              <span>
+                {research?.status === "ready"
+                  ? "Analysis Ready"
+                  : "Analysis in Progress"}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* ERROR */}
+        {error && (
+          <div className="workspace-error glass-card">
+            {error}
+          </div>
+        )}
+
+        {/* MAIN NAVIGATION */}
+        <section className="research-sections">
+          <div className="section-heading">
+            <span>EXPLORE YOUR RESEARCH</span>
+
+            <h2>Research Insights</h2>
+
+            <p>
+              Choose a section below to explore the
+              results generated from your papers.
+            </p>
+          </div>
+
+          <div className="floating-tabs">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                className={`floating-tab glass-card ${
+                  activeTab === tab.id
+                    ? "active"
+                    : ""
+                }`}
+                onClick={() =>
+                  handleTabClick(tab.id)
+                }
+              >
+                <span className="tab-icon">
+                  {tab.icon}
+                </span>
+
+                <span className="tab-text">
+                  <strong>{tab.title}</strong>
+
+                  <small>
+                    {tab.description}
+                  </small>
+                </span>
+
+                <span className="tab-arrow">
+                  {activeTab === tab.id
+                    ? "↑"
+                    : "→"}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* RESULTS */}
+        <section className="results-area">
+          {!activeTab && (
+            <div className="results-placeholder glass-card">
+              <div className="placeholder-icon">
+                ✦
+              </div>
+
+              <h2>
+                Choose a research section
+              </h2>
+
+              <p>
+                Select Learning Path, Citations,
+                or Paper Analysis above to view
+                its results.
+              </p>
+            </div>
+          )}
+
+          {activeTab === "learning" && (
+  <LearningPath
+    papers={papers}
+    prerequisites={prerequisites}
+    research={research}
+  />
+)}
+
+          {activeTab === "citations" &&
+            renderCitations()}
+
+          {activeTab === "analysis" &&
+            renderAnalysis()}
+        </section>
+
+        {/* FOOTER */}
+        <footer className="workspace-footer glass-card">
+          <div className="footer-brand">
+            <div className="footer-logo">
+              ▰
+            </div>
+
+            <div>
+              <strong>
+                IntelliResearch
+              </strong>
+
+              <span>
+                Your intelligent research workspace
+              </span>
+            </div>
+          </div>
+
+          <div className="footer-actions">
+            <button
+              className="footer-ai-button"
+              onClick={() =>
+                navigate(
+                  `/research/${id}/assistant`
+                )
+              }
+            >
+              <span className="footer-button-icon">
+                ◉
+              </span>
+
+              <span>
+                <strong>
+                  AI Research Assistant
+                </strong>
+
+                <small>
+                  Ask questions about your research
+                </small>
+              </span>
+
+              <b>→</b>
+            </button>
+
+            <button
+              className="footer-download-button"
+              onClick={downloadLearningPath}
+            >
+              <span>↗</span>
+              Learning Path PDF
+            </button>
+
+            <button
+              className="footer-download-button"
+              onClick={downloadCitations}
+            >
+              <span>↗</span>
+              Citations PDF
+            </button>
+
+            <button
+              className="footer-download-button"
+              onClick={downloadAnalysis}
+            >
+              <span>↗</span>
+              Analysis PDF
+            </button>
+          </div>
+
+          <div className="footer-quote">
+            Research is to see what everybody else has
+            seen, and to think what nobody else has
+            thought.
+          </div>
+        </footer>
+      </div>
+    </main>
+  );
+}
