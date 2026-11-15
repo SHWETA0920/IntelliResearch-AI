@@ -392,3 +392,56 @@
     display: none;
   }
 }
+
+.learning-sequence-group {
+  margin-bottom: 28px;
+}
+
+.learning-sequence-heading {
+  margin-bottom: 16px;
+}
+
+.learning-sequence-heading > span {
+  color: #e8963d;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.learning-sequence-heading h3 {
+  margin: 6px 0;
+}
+
+.learning-sequence-heading p {
+  color: #687083;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.learning-reason {
+  margin-top: 12px;
+  color: #687083;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.learning-reason strong {
+  color: #e8963d;
+}
+
+.learning-paper-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.learning-step {
+  margin-bottom: 12px;
+}
+
+.dependency-item p {
+  flex-basis: 100%;
+  margin: 6px 0 0;
+  color: #687083;
+  font-size: 12px;
+  line-height: 1.5;
+}

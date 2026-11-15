@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import "../styles/ResearchWorkspace.css";
 import researchBackground from "../assets/workspace-background.png";
 import LearningPath from "../components/LearningPath";
+import CitationGraph from "../components/CitationGraph";
 
 const TABS = [
   {
@@ -94,6 +95,8 @@ function DeepAnalysisSection({ deep }) {
     </div>
   );
 }
+
+
 
 export default function ResearchWorkspace() {
   const { id } = useParams();
@@ -547,6 +550,7 @@ const getPaperYear = (paperOrId) => {
     "—"
   );
 };
+
 function renderCitations() {
   return (
     <section className="result-card">
@@ -559,8 +563,8 @@ function renderCitations() {
           <h2>Citations</h2>
 
           <p>
-            Paper-to-paper citation relationships discovered
-            in your research.
+            Explore paper-to-paper citation relationships
+            and each paper's relevance assessment.
           </p>
         </div>
 
@@ -572,145 +576,14 @@ function renderCitations() {
         </button>
       </div>
 
-      {citations.length === 0 ? (
-        <div className="empty-result">
-          No citation relationships were found.
-        </div>
-      ) : (
-        <div className="citation-table-wrapper">
-          <table className="citation-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Citing Paper</th>
-                <th>Cited Paper</th>
-                <th>Year</th>
-              </tr>
-            </thead>
-
-            <tbody>
-  {citations.map((citation, index) => {
-    const sourceId =
-      typeof citation.citing_paper === "object"
-        ? citation.citing_paper.id
-        : citation.citing_paper;
-
-    const targetId =
-      typeof citation.cited_paper === "object"
-        ? citation.cited_paper.id
-        : citation.cited_paper;
-
-    const sourcePaper = getPaperById(sourceId);
-    const targetPaper = getPaperById(targetId);
-
-    return (
-      <tr key={citation.id || index}>
-        <td>{index + 1}</td>
-
-        <td>
-          <strong>
-            {getPaperTitle(sourceId)}
-          </strong>
-
-          <div className="citation-meta">
-            {getPaperAuthors(sourceId)}
-          </div>
-        </td>
-
-        <td>
-          <strong>
-            {getPaperTitle(targetId)}
-          </strong>
-
-          <div className="citation-meta">
-            {getPaperAuthors(targetId)}
-          </div>
-        </td>
-
-        <td>
-          {getPaperYear(sourceId)}
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-          </table>
-        </div>
-      )}
+      <CitationGraph
+        papers={papers}
+        citations={citations}
+      />
     </section>
   );
 }
 
-  // function renderAnalysis() {
-  //   return (
-  //     <section className="result-card">
-  //       <div className="result-header">
-  //         <div>
-  //           <span className="result-eyebrow">
-  //             PAPER-BY-PAPER INFORMATION
-  //           </span>
-
-  //           <h2>Paper Analysis</h2>
-
-  //           <p>
-  //             Detailed information and AI-generated
-  //             summaries for your research papers.
-  //           </p>
-  //         </div>
-
-  //         <button
-  //           className="download-button"
-  //           onClick={downloadAnalysis}
-  //         >
-  //           ↓ PDF
-  //         </button>
-  //       </div>
-
-  //       {papers.length === 0 ? (
-  //         <div className="empty-result">
-  //           No papers are available for analysis.
-  //         </div>
-  //       ) : (
-  //         <div className="analysis-list">
-  //           {papers.map((paper, index) => (
-  //             <article
-  //               className="analysis-paper"
-  //               key={paper.id || index}
-  //             >
-  //               <div className="analysis-number">
-  //                 {String(index + 1).padStart(2, "0")}
-  //               </div>
-
-  //               <div className="analysis-content">
-  //                 <div className="analysis-title-row">
-  //                   <h3>
-  //                     {paper.title ||
-  //                       `Paper ${paper.id}`}
-  //                   </h3>
-
-  //                   <span>
-  //                     {getPaperYear(paper)}
-  //                   </span>
-  //                 </div>
-
-  //                 <p className="paper-authors">
-  //                   {paper.authors ||
-  //                     "Authors not available"}
-  //                 </p>
-
-  //                 <div className="analysis-description">
-  //                   {paper.ai_summary ||
-  //                     paper.abstract ||
-  //                     "No paper analysis is available yet."}
-  //                 </div>
-  //               </div>
-  //             </article>
-  //           ))}
-  //         </div>
-  //       )}
-  //     </section>
-  //   );
-  // }
 
   function renderAnalysis() {
   return (

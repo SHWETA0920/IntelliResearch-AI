@@ -580,3 +580,17 @@ body {
   background: #e69123 !important;
   color: #080808 !important;
 }
+.react-flow__controls-button {
+  background: #101b2b !important;
+  border-bottom: 1px solid #334155 !important;
+  fill: #f4f7fb !important;
+  color: #f4f7fb !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #1e293b !important;
+}
+
+.react-flow__controls-button svg {
+  fill: #f4f7fb !important;
+}
