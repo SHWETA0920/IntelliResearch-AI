@@ -18,3 +18,5 @@ venv/
 __pycache__/
 db.sqlite3
 media/
+# Local Chroma database
+chroma_store/
