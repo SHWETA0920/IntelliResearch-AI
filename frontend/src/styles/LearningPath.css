@@ -9,8 +9,7 @@
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 
-  box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 
   color: #f5f1ea;
 }
@@ -67,7 +66,7 @@
 
   padding: 11px 17px;
 
-  background: rgba(232, 150, 61, 0.10);
+  background: rgba(232, 150, 61, 0.1);
 
   color: #e8963d;
 
@@ -130,12 +129,11 @@
 .learning-paper-first {
   border-color: rgba(232, 150, 61, 0.42);
 
-  background:
-    linear-gradient(
-      135deg,
-      rgba(232, 150, 61, 0.12),
-      rgba(255, 255, 255, 0.045)
-    );
+  background: linear-gradient(
+    135deg,
+    rgba(232, 150, 61, 0.12),
+    rgba(255, 255, 255, 0.045)
+  );
 }
 
 .learning-number {
@@ -213,7 +211,7 @@
 
   border-radius: 999px;
 
-  background: rgba(232, 150, 61, 0.10);
+  background: rgba(232, 150, 61, 0.1);
 
   border: 1px solid rgba(232, 150, 61, 0.28);
 
@@ -243,8 +241,7 @@
 
   padding-top: 27px;
 
-  border-top:
-    1px solid rgba(237, 239, 247, 0.10);
+  border-top: 1px solid rgba(237, 239, 247, 0.1);
 }
 
 .dependency-heading > span {
@@ -318,8 +315,7 @@
 
   border-radius: 16px;
 
-  border:
-    1px dashed rgba(237, 239, 247, 0.16);
+  border: 1px dashed rgba(237, 239, 247, 0.16);
 
   background: rgba(255, 255, 255, 0.025);
 }
@@ -390,5 +386,185 @@
 
   .dependency-item b {
     display: none;
+  }
+}
+
+/* =========================================================
+   Learning path - sequence groups
+   ========================================================= */
+
+.learning-sequence-group {
+  margin-bottom: 28px;
+}
+
+.learning-sequence-heading {
+  margin-bottom: 16px;
+}
+
+.learning-sequence-heading > span {
+  color: #e8963d;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.learning-sequence-heading h3 {
+  margin: 6px 0;
+}
+
+.learning-sequence-heading p {
+  color: #687083;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.learning-reason {
+  margin-top: 12px;
+  color: #687083;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.learning-reason strong {
+  color: #e8963d;
+}
+
+.learning-paper-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.learning-step {
+  margin-bottom: 12px;
+}
+
+.dependency-item p {
+  flex-basis: 100%;
+  margin: 6px 0 0;
+  color: #687083;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   Learning path - per-card summary
+   ========================================================= */
+
+.learning-summary {
+  margin-top: 14px;
+  padding-top: 12px;
+
+  border-top: 1px dashed rgba(237, 239, 247, 0.14);
+
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.learning-role {
+  align-self: flex-start;
+
+  padding: 3px 9px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  border: 1px solid transparent;
+}
+
+.learning-role-foundation {
+  color: #e8963d;
+  background: rgba(232, 150, 61, 0.12);
+  border-color: rgba(232, 150, 61, 0.35);
+}
+
+.learning-role-bridge {
+  color: #8fb0ff;
+  background: rgba(124, 158, 242, 0.12);
+  border-color: rgba(124, 158, 242, 0.35);
+}
+
+.learning-role-advanced {
+  color: #2ed9c3;
+  background: rgba(46, 217, 195, 0.1);
+  border-color: rgba(46, 217, 195, 0.32);
+}
+
+.learning-role-standalone {
+  color: rgba(245, 241, 234, 0.65);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(237, 239, 247, 0.18);
+}
+
+/* div, not p: ".learning-paper-info p" forces a single line with an ellipsis */
+.learning-summary-line {
+  color: rgba(245, 241, 234, 0.74);
+
+  font-size: 12.5px;
+  line-height: 1.55;
+
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.learning-summary-line strong {
+  color: rgba(245, 241, 234, 0.95);
+  font-weight: 600;
+}
+
+.learning-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  margin-top: 2px;
+}
+
+.learning-keyword {
+  padding: 3px 9px;
+
+  border-radius: 999px;
+
+  background: rgba(232, 150, 61, 0.09);
+  border: 1px solid rgba(232, 150, 61, 0.26);
+
+  color: #f0b36d;
+
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+/* =========================================================
+   Merge fixes
+   ========================================================= */
+
+/* The reason is a <p> inside .learning-paper-info, so the generic
+   ".learning-paper-info p" rule (nowrap + ellipsis) would cut it to one
+   line. Allow it to wrap. */
+.learning-paper-info p.learning-reason {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* A recorded reason adds a <p> inside the 3-column dependency grid:
+   span the full row, and right-align the target span (no longer :last-child). */
+.dependency-item p {
+  grid-column: 1 / -1;
+}
+
+.dependency-item span:nth-of-type(2) {
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  .dependency-item span:nth-of-type(2) {
+    text-align: left;
   }
 }

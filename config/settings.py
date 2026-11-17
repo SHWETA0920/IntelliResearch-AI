@@ -10,16 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 from dotenv import load_dotenv
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load variables from .env (project root, next to manage.py) into os.environ
-load_dotenv(BASE_DIR / ".env")
-
+load_dotenv(BASE_DIR / ".env", override=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
@@ -31,12 +28,6 @@ SECRET_KEY = "django-insecure-1#f#l@uoebtfhhr%$@b)^v3*3al9%9(qfeg#g_45_gv(u^62ed
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
-# --- LLM config for paper analysis (research/services/pipeline.py) ---
-LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://api.groq.com/openai/v1")
-LLM_MODEL = os.environ.get("LLM_MODEL", "openai/gpt-oss-120b")
-LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
 
 
 # Application definition
@@ -143,3 +134,17 @@ MAILERS = {
 }
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+import os
+
+LLM_BASE_URL = os.getenv(
+    "LLM_BASE_URL",
+    "https://api.groq.com/openai/v1"
+)
+
+LLM_MODEL = os.getenv(
+    "LLM_MODEL",
+    "openai/gpt-oss-120b"
+)
+
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")

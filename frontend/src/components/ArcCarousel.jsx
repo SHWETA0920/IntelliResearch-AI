@@ -5,6 +5,7 @@ import {
   useTransform,
   animate,
 } from "framer-motion";
+
 import { useEffect, useState } from "react";
 
 /* ============================================================
@@ -68,7 +69,6 @@ function BookCard({
 
   const y = useTransform(depth, (d) => {
     const curve = 1 - Math.max(0, d);
-
     return curve * 55;
   });
 
@@ -88,7 +88,6 @@ function BookCard({
 
   const rotateX = useTransform(depth, (d) => {
     const curve = 1 - Math.max(0, d);
-
     return curve * 2.5;
   });
 
@@ -99,37 +98,25 @@ function BookCard({
   const opacity = useTransform(frontFactor, (f) => 0.65 + f * 0.35);
 
   /* ============================================================
-     IMAGE BRIGHTNESS
-  ============================================================ */
-
-  const brightness = useTransform(frontFactor, (f) => 0.68 + f * 0.32);
-
-  const saturation = useTransform(frontFactor, (f) => 0.8 + f * 0.2);
-
-  const filter = useTransform(
-    [brightness, saturation],
-    ([b, s]) => `brightness(${b}) saturate(${s})`,
-  );
-
-  /* ============================================================
      Z INDEX
   ============================================================ */
 
   const zIndex = useTransform(frontFactor, (f) => Math.round(10 + f * 500));
 
   /* ============================================================
-     SHADOW
+     STATIC SHADOW
+
+     Previously this was calculated continuously through
+     useTransform, even though its output did not depend on f.
+
+     Now the same shadow is calculated only once per card.
   ============================================================ */
 
-  const boxShadow = useTransform(frontFactor, (f) => {
-    const color = item.color || "#ffffff";
-
-    return `
-        0 30px 70px rgba(0,0,0,0.55),
-        0 10px 30px ${color}22,
-        inset 0 1px 0 rgba(255,255,255,0.18)
-      `;
-  });
+  const boxShadow = `
+    0 30px 70px rgba(0,0,0,0.55),
+    0 10px 30px ${item.color || "#ffffff"}22,
+    inset 0 1px 0 rgba(255,255,255,0.18)
+  `;
 
   const isCenter = index === Math.floor(totalItems / 2);
 
@@ -163,7 +150,6 @@ function BookCard({
         height: cardHeight,
 
         marginLeft: -cardWidth / 2,
-
         marginTop: -cardHeight / 2,
 
         /*
@@ -185,16 +171,12 @@ function BookCard({
         scale,
 
         opacity,
-
         zIndex,
 
         transformStyle: "preserve-3d",
-
         transformOrigin: "center center",
 
         cursor: isCenter ? "default" : "pointer",
-
-        willChange: "transform, opacity",
       }}
     >
       {/* ======================================================
@@ -218,8 +200,6 @@ function BookCard({
 
           boxShadow,
 
-          filter,
-
           transformStyle: "preserve-3d",
         }}
       >
@@ -230,23 +210,21 @@ function BookCard({
         <img
           src={item.image}
           alt={item.label || "Travel"}
+          decoding="async"
           draggable={false}
           style={{
             position: "absolute",
-
             inset: 0,
 
             width: "100%",
             height: "100%",
 
             objectFit: "cover",
-
             objectPosition: "center",
 
             display: "block",
 
             userSelect: "none",
-
             pointerEvents: "none",
           }}
         />
@@ -258,7 +236,6 @@ function BookCard({
         <div
           style={{
             position: "absolute",
-
             inset: 0,
 
             background: `
@@ -281,7 +258,6 @@ function BookCard({
         <div
           style={{
             position: "absolute",
-
             inset: 0,
 
             background:
@@ -313,14 +289,6 @@ function BookCard({
             pointerEvents: "none",
           }}
         />
-
-        {/* ====================================================
-            GLASS LABEL — removed. Cards no longer show a text
-            heading (e.g. "Learning Path", "Citation Graph",
-            "Prerequisites") overlaid on the image. Everything
-            else about the card (image, gradient, spine, shadow,
-            3D transforms, click-to-select) is unchanged.
-        ==================================================== */}
       </motion.div>
     </motion.div>
   );
@@ -331,10 +299,6 @@ function BookCard({
 ============================================================ */
 
 function ArcCarousel({ items = [] }) {
-  if (!items.length) {
-    return null;
-  }
-
   /* ==========================================================
      STATE
   ========================================================== */
@@ -382,28 +346,25 @@ function ArcCarousel({ items = [] }) {
   ========================================================== */
 
   const cardWidth =
-    viewportWidth < 480
-      ? 135
-      : viewportWidth < 768
+    viewportWidth < 380
+      ? 115
+      : viewportWidth < 680
         ? 150
-        : viewportWidth < 1200
-          ? 175
+        : viewportWidth < 1100
+          ? 165
           : 205;
 
   const cardHeight =
-    viewportWidth < 480
-      ? 200
-      : viewportWidth < 768
-        ? 225
-        : viewportWidth < 1200
-          ? 270
-          : 310;
+    viewportWidth < 380
+      ? 160
+      : viewportWidth < 680
+        ? 200
+        : viewportWidth < 1100
+          ? 230
+          : 280;
 
   /* ==========================================================
      CYLINDER RADIUS
-
-     Slightly increased so the carousel still covers
-     the complete website width after reducing the angle.
   ========================================================== */
 
   const radius =
@@ -416,26 +377,18 @@ function ArcCarousel({ items = [] }) {
           : 920;
 
   /* ==========================================================
-     REDUCED SPACE BETWEEN CARDS
-
-     Previous:
-       Desktop = 155 degrees
-
-     Now:
-       Desktop = 132 degrees
-
-     This brings neighboring cards closer together while
-     the larger radius keeps the overall carousel wide.
+     VISIBLE ARC
   ========================================================== */
 
-  const visibleArc =
-    viewportWidth < 600 ? 105 : viewportWidth < 1200 ? 100 : 100;
+  const visibleArc = viewportWidth < 600 ? 105 : 100;
 
   const angleStep =
     items.length > 1 ? (visibleArc / (items.length - 1)) * (Math.PI / 180) : 0;
 
   /* ==========================================================
      MOUSE MOVE
+
+     Original mouse-based rotation is preserved.
   ========================================================== */
 
   const handleMouseMove = (e) => {
@@ -451,9 +404,6 @@ function ArcCarousel({ items = [] }) {
 
     const centered = normalized * 2 - 1;
 
-    /*
-     * Full website-width movement.
-     */
     const targetRotation = centered * 65;
 
     rotation.set(targetRotation);
@@ -550,6 +500,8 @@ function ArcCarousel({ items = [] }) {
 
   /* ==========================================================
      WHEEL
+
+     Original wheel navigation is preserved.
   ========================================================== */
 
   const handleWheel = (e) => {
@@ -587,6 +539,16 @@ function ArcCarousel({ items = [] }) {
   }, [activeIndex, items.length]);
 
   /* ==========================================================
+     EMPTY STATE
+
+     All hooks are called before this conditional return.
+  ========================================================== */
+
+  if (!items.length) {
+    return null;
+  }
+
+  /* ==========================================================
      RENDER
   ========================================================== */
 
@@ -602,7 +564,6 @@ function ArcCarousel({ items = [] }) {
          * TRUE FULL WIDTH
          */
         width: "100vw",
-
         marginLeft: "calc(50% - 50vw)",
 
         height: viewportWidth < 600 ? 360 : 430,
@@ -611,18 +572,13 @@ function ArcCarousel({ items = [] }) {
          * 3D PERSPECTIVE
          */
         perspective: "1600px",
-
         perspectiveOrigin: "50% 48%",
 
         overflow: "hidden",
 
         touchAction: "pan-y",
-
         userSelect: "none",
 
-        /*
-         * NO BACKGROUND
-         */
         background: "transparent",
       }}
     >
@@ -643,13 +599,10 @@ function ArcCarousel({ items = [] }) {
         onDragEnd={handleDragEnd}
         style={{
           position: "absolute",
-
           inset: 0,
 
           display: "flex",
-
           alignItems: "center",
-
           justifyContent: "center",
 
           transformStyle: "preserve-3d",
@@ -729,9 +682,7 @@ function ArcCarousel({ items = [] }) {
               fontSize: "26px",
 
               display: "flex",
-
               alignItems: "center",
-
               justifyContent: "center",
 
               cursor: activeIndex === 0 ? "default" : "pointer",
@@ -741,7 +692,6 @@ function ArcCarousel({ items = [] }) {
               zIndex: 1000,
 
               backdropFilter: "blur(8px)",
-
               WebkitBackdropFilter: "blur(8px)",
             }}
           >
@@ -776,9 +726,7 @@ function ArcCarousel({ items = [] }) {
               fontSize: "26px",
 
               display: "flex",
-
               alignItems: "center",
-
               justifyContent: "center",
 
               cursor: activeIndex === items.length - 1 ? "default" : "pointer",
@@ -788,7 +736,6 @@ function ArcCarousel({ items = [] }) {
               zIndex: 1000,
 
               backdropFilter: "blur(8px)",
-
               WebkitBackdropFilter: "blur(8px)",
             }}
           >

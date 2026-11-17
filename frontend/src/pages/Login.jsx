@@ -524,7 +524,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
-import loginBackground from "../assets/login-background.png";
+import loginBackground from "../assets/images/AI.png";
 
 function Login() {
   const [email, setEmail] = useState("");
