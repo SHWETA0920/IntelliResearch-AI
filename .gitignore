@@ -13,3 +13,10 @@ staticfiles/
 Thumbs.db
 "@ | Out-File -Encoding utf8 .gitignore
 .env
+*.env
+venv/
+__pycache__/
+db.sqlite3
+media/
+# Local Chroma database
+chroma_store/
